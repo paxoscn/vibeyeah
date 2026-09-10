@@ -814,8 +814,8 @@ async fn handle_set(
             receive_id,
             receive_id_type,
             "用法：/set <key> <value>\n\
-             支持的 key：openai_base_url、openai_api_key、openai_model\n\
-             示例：set openai_base_url https://api.openai.com\n\
+             支持的 key：openai_base_url、openai_api_key、openai_model、k8s_namespace、image_pull_secret\n\
+             示例：/set openai_base_url https://api.openai.com\n\
              （openai_base_url 请勿带 /v1 尾缀，系统会按需要自动补全）",
         )
         .await;

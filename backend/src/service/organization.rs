@@ -134,9 +134,17 @@ pub async fn set_org_property(
         "openai_base_url" => active.openai_base_url = Set(opt(value)),
         "openai_api_key" => active.openai_api_key = Set(opt(value)),
         "openai_model" => active.openai_model = Set(opt(value)),
+        "k8s_namespace" => {
+            let v = value.trim();
+            if v.is_empty() {
+                return Err(anyhow!("k8s_namespace 不能为空"));
+            }
+            active.k8s_namespace = Set(v.to_string());
+        }
+        "image_pull_secret" => active.image_pull_secret = Set(opt(value)),
         _ => {
             return Err(anyhow!(
-                "不支持的属性：{key}（支持：openai_base_url / openai_api_key / openai_model）"
+                "不支持的属性：{key}（支持：openai_base_url / openai_api_key / openai_model / k8s_namespace / image_pull_secret）"
             ))
         }
     }
