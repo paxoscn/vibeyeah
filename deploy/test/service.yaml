@@ -1,0 +1,19 @@
+---
+apiVersion: "v1"
+kind: "Service"
+metadata:
+  name: "vibeyeah-test"
+  namespace: "mg2-test"
+  labels:
+    devops.aliyun.com/app-name: "vibeyeah"
+    devops.aliyun.com/version: "20260610175145-442"
+    devops.aliyun.com/org-id: "000000000000000000000000"
+    devops.aliyun.com/env-name: "test"
+spec:
+  selector:
+    run: "vibeyeah-test"
+  ports:
+  - name: "http-8080"
+    protocol: "TCP"
+    port: 8080
+    targetPort: 8080

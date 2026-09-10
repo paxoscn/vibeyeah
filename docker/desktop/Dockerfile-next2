@@ -1,0 +1,26 @@
+# docker image build -f Dockerfile-next2 -t desktop:20260613 .
+# minikube start
+# minikube status
+# minikube image list
+# minikube image load desktop:20260613
+# kubectl get pods
+FROM desktop:20260612
+
+USER agent
+WORKDIR /home/agent
+
+RUN mkdir -p /home/agent/.claude
+COPY claude-config/claude.json /home/agent/.claude.json
+COPY claude-config/settings.json /home/agent/.claude/settings.json
+
+COPY hermes-config/.env /home/agent/.hermes/.env
+COPY hermes-config/auth.json /home/agent/.hermes/auth.json
+COPY hermes-config/channel_directory.json /home/agent/.hermes/channel_directory.json
+COPY hermes-config/config.yaml /home/agent/.hermes/config.yaml
+COPY hermes-config/gateway_state.json /home/agent/.hermes/gateway_state.json
+COPY hermes-config/state.db /home/agent/.hermes/state.db
+
+COPY --chown=agent:agent entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
+
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]

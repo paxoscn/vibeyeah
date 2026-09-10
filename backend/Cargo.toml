@@ -1,0 +1,70 @@
+[package]
+name = "vibeyeah-core"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+name = "vibeyeah_core"
+path = "src/lib.rs"
+
+[[bin]]
+name = "vibeyeah"
+path = "src/main.rs"
+
+[dependencies]
+axum = { version = "0.8.5", features = ["macros"] }
+tokio = { version = "1", features = ["full"] }
+tower = "0.5"
+tower-http = { version = "0.6", features = ["cors", "trace"] }
+
+sea-orm = { version = "1", features = [
+  "sqlx-postgres",
+  "sqlx-sqlite",
+  "runtime-tokio-rustls",
+  "macros",
+] }
+sea-orm-migration = { version = "1", features = [
+  "sqlx-postgres",
+  "sqlx-sqlite",
+  "runtime-tokio-rustls",
+] }
+# 使 SQLite 以 bundled 方式编译（无需系统 libsqlite3 头文件，方便 CI / 本地）
+libsqlite3-sys = { version = "0.30", features = ["bundled"] }
+
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+
+jsonwebtoken = "9"
+bcrypt = "0.15"
+rand = "0.8"
+chrono = { version = "0.4", features = ["serde"] }
+uuid = { version = "1", features = ["v4", "serde"] }
+reqwest = { version = "0.12", default-features = false, features = ["json", "stream", "multipart", "rustls-tls"] }
+futures-util = "0.3"
+openlark = { version = "0.17", default-features = false, features = ["auth", "communication", "websocket"] }
+qrcode = "0.14"
+image = { version = "0.25", default-features = false, features = ["png"] }
+kube = { version = "0.95", features = ["runtime", "derive", "ws"] }
+k8s-openapi = { version = "0.23", features = ["v1_30"] }
+tokio-cron-scheduler = "0.13"
+anyhow = "1"
+rustls = { version = "0.23", features = ["ring"] }
+base64 = "0.22"
+thiserror = "1"
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+dotenvy = "0.15"
+
+[profile.release]
+# 链接时优化
+lto = true
+# 单一项目优化
+codegen-units = 1
+# 发生 panic 时不进行栈展开
+panic = "abort"
+# 移除调试符号
+strip = true
+# 优化最终二进制文件大小
+opt-level = "z"
+
+[workspace]

@@ -1,0 +1,39 @@
+VibeYeah
+Copyright 2026 The VibeYeah Authors
+
+This product includes software developed using the following third-party
+projects. Each is licensed under its own terms; see the respective project
+for details. This NOTICE does not modify the Apache License 2.0 under which
+the VibeYeah source code in this repository is distributed.
+
+Runtime / agent
+- hermes-agent (Nous Research) — the in-pod AI agent runtime started by
+  docker/desktop/entrypoint.sh. https://github.com/NousResearch/hermes-agent
+- The bundled skill catalog under docker/desktop/configs/.hermes/skills/
+  originates from hermes-agent and/or third parties. Those skill files are
+  provided as seed content and are NOT necessarily covered by this
+  repository's Apache-2.0 grant; review each skill's own license before
+  redistributing or using them.
+
+Backend (Rust) — see backend/Cargo.toml and backend/Cargo.lock
+- axum, tokio, tower, tower-http (MIT)
+- sea-orm, sea-orm-migration (MIT OR Apache-2.0)
+- kube, k8s-openapi (Apache-2.0)
+- reqwest, serde, serde_json, futures-util (MIT OR Apache-2.0)
+- openlark (Feishu/Lark SDK), jsonwebtoken, bcrypt, uuid, chrono, and
+  other crates as listed in backend/Cargo.toml.
+
+Frontend — see frontend/package.json
+- React, React DOM, React Router (MIT)
+- Vite, @vitejs/plugin-react (MIT)
+- Zustand (MIT), qrcode.react (ISC), Tailwind CSS (MIT)
+
+Desktop image — see docker/desktop/Dockerfile
+- Ubuntu, Google Chrome, Node.js, OpenJDK, Rust/rustup, uv, nvm, Playwright.
+  Each is licensed by its respective vendor.
+
+Trademarks
+- "Feishu" / "Lark" are trademarks of ByteDance. "WeChat" / "企业微信" are
+  trademarks of Tencent. "Aliyun" / "Alibaba Cloud" are trademarks of
+  Alibaba Group. "Kubernetes" is a trademark of the Linux Foundation.
+  This project is not endorsed by or affiliated with any of these owners.

@@ -1,0 +1,36 @@
+# mediamtx 配置
+# 文档: https://github.com/bluenviron/mediamtx
+
+logLevel: info
+logDestinations: [stdout]
+
+# RTSP
+rtsp: yes
+rtspAddress: :8554
+protocols: [tcp]
+
+# WebRTC
+webrtc: yes
+webrtcAddress: :8889
+webrtcAdditionalHosts: []   # 运行时通过环境变量 WEBRTC_ADDITIONAL_HOSTS 覆盖
+
+# HTTP API（用于查询流状态）
+api: yes
+apiAddress: :9997
+
+# HLS（可选，关闭节省资源）
+hls: no
+
+# SRT
+srt: no
+
+# 路径配置：接受从 ffmpeg 推入的 RTSP 流
+paths:
+  desktop:
+    # 允许任意来源推流（ffmpeg 从 localhost 推）
+    publishUser: ""
+    publishPass: ""
+    readUser: ""
+    readPass: ""
+    # 没有推流时不报错
+    # source: publisher

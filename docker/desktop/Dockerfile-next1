@@ -1,0 +1,19 @@
+# docker image build -f Dockerfile-next1 -t desktop:20260609 .
+FROM desktop:20260608
+
+USER root
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    # 终端
+    xterm \
+    # 字体（xterm 和 X 应用必需）
+    xfonts-base xfonts-75dpi xfonts-100dpi
+
+USER agent
+WORKDIR /home/agent
+
+RUN curl -fsSL https://hermes-agent.nousresearch.com/install.sh | bash
+RUN mkdir -p /home/agent/.hermes
+COPY hermes-config.yaml /home/agent/.hermes/config.yaml
+
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]

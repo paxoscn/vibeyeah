@@ -1,0 +1,19 @@
+## docker create --name desktop-20260831 desktop:20260831                                                                                                                                                                                   
+# ./run-local.sh
+## ./run-local-no-vnc.sh
+# docker exec -u agent -it desktop-local bash
+# docker cp ~/Workspace/vibeyeah/docker/desktop/hermes-config/skills/software-development/teabydao-login desktop-local:/home/agent/.hermes/skills/software-development/
+# docker cp ~/Workspace/vibeyeah/docker/desktop/hermes-config/skills/software-development/teabydao-coupon desktop-local:/home/agent/.hermes/skills/software-development/
+# sed -i 's/cli_aaa0e0a8e43bdbe9/__LARK_APP_ID__/g' .hermes/.env
+# sed -i 's/gMYkfpb6X3qOGbICgx4bXgBcCHRgrmmu/__LARK_APP_SECRET__/g' .hermes/.env
+### docker save -o /tmp/desktop-20260831.tar desktop:20260831
+## docker export desktop-20260831 >/tmp/desktop-20260831.tar
+# docker export desktop-local >/tmp/desktop-20260831.tar
+# ~/Downloads/ossutil-v1.7.19-mac-amd64/ossutil cp /tmp/desktop-20260831.tar oss://your-bucket/your-path/desktop-20260831.tar
+ 
+#FROM desktop:20260831
+#ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
+ 
+FROM scratch
+ADD desktop-20260831.tar /
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]

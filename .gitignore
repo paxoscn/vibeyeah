@@ -1,0 +1,50 @@
+# ── OS ────────────────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+
+# ── Editors / IDE ─────────────────────────────────────────────────────────────
+.idea/
+*.swp
+*.swo
+*~
+# .vscode/ is intentionally tracked (shared debug config)
+
+# ── Local AI tooling state ────────────────────────────────────────────────────
+.claude/
+.kiro/
+
+# ── Rust ──────────────────────────────────────────────────────────────────────
+target/
+**/*.rs.bk
+
+# ── Env files & secrets ───────────────────────────────────────────────────────
+# Ignore local env files; keep *.example templates and the hermes seed template.
+.env
+.env.local
+.env.*.local
+!.env.example
+!docker/desktop/configs/.hermes/.env
+
+# ── Python ────────────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# ── Databases / dumps ─────────────────────────────────────────────────────────
+*.db
+*.sqlite
+*.sqlite3
+
+# ── hermes runtime state (regenerated at runtime; never commit) ───────────────
+**/.hermes/state.db
+**/.hermes/state.db-*
+**/.hermes/gateway_state.json
+**/.hermes/channel_directory.json
+**/.hermes/auth.json
+**/.hermes/sessions/
+**/.hermes/logs/
+**/.hermes/backups/
+
+# ── Logs ──────────────────────────────────────────────────────────────────────
+*.log

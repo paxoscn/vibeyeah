@@ -1,0 +1,90 @@
+---
+apiVersion: "apps/v1"
+kind: "Deployment"
+metadata:
+  name: "vibeyeah-test"
+  namespace: "mg2-test"
+  labels:
+    run: "vibeyeah-test"
+    devops.aliyun.com/app-name: "vibeyeah"
+    devops.aliyun.com/env-name: "test"
+    devops.aliyun.com/version: "20260615115921-298"
+    devops.aliyun.com/org-id: "000000000000000000000000"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      run: "vibeyeah-test"
+  template:
+    metadata:
+      annotations:
+        alibabacloud.com/burst-resource: "eci"
+        k8s.aliyun.com/eci-overhead-reservation-option: "{\"enableOverheadReservation\"\
+          :true}"
+      labels:
+        run: "vibeyeah-test"
+        aliyun.com/agent-version: "4.8.0"
+        armsPilotAutoEnable: "on"
+        armsPilotCreateAppName: "vibeyeah"
+        devops.aliyun.com/app-name: "vibeyeah"
+        devops.aliyun.com/env-name: "test"
+        devops.aliyun.com/version: "20260615115921-298"
+        devops.aliyun.com/org-id: "000000000000000000000000"
+    spec:
+      terminationGracePeriodSeconds: 90
+      volumes:
+      - name: vibeyeah-nas-pvc
+        persistentVolumeClaim:
+          claimName: vibeyeah-nas-pvc
+      containers:
+      - name: "vibeyeah"
+        image: "your-registry.example.com/vibeyeah/backend:latest"
+        ports:
+        - containerPort: 8080
+        resources:
+          limits:
+            cpu: 1
+            memory: "2048Mi"
+          requests:
+            cpu: 0.1
+            memory: "1024Mi"
+        volumeMounts:
+        - name: vibeyeah-nas-pvc
+          mountPath: /data/nas
+        livenessProbe:
+          initialDelaySeconds: 30
+          failureThreshold: 3
+          periodSeconds: 20
+          successThreshold: 1
+          timeoutSeconds: 5
+          tcpSocket:
+            port: 8080
+        readinessProbe:
+          initialDelaySeconds: 30
+          failureThreshold: 3
+          periodSeconds: 20
+          successThreshold: 1
+          timeoutSeconds: 5
+          tcpSocket:
+            port: 8080
+        env:
+        - name: "profiler.micro.service.pre.stop.wait.time"
+          value: "45"
+        - name: "aliyun_logs_vibeyeah-dev-log"
+          value: "/home/logs/vibeyeah/*.log"
+        - name: "aliyun_logs_vibeyeah-dev-log_ttl"
+          value: "7"
+        - name: "appName"
+          value: "vibeyeah"
+        - name: profile
+          value: "test"
+        # Only DATABASE_URL / BIND_ADDR are read from the environment.
+        # Everything else (images, namespace, PVC, jwt_secret, callback_token,
+        # lark_app_*, ...) lives in the DB `settings` table, seeded on first
+        # startup — see the README configuration table.
+        - name: DATABASE_URL
+          value: "postgres://postgres:postgres@postgres-service:5432/vibeyeah"
+        - name: BIND_ADDR
+          value: "0.0.0.0:8080"
+      imagePullSecrets:
+      - name: "aliyuncs-registry-key"

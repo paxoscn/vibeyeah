@@ -1,0 +1,81 @@
+{
+  "numStartups": 3,
+  "tipsHistory": {
+    "new-user-warmup": 1,
+    "plan-mode-for-complex-tasks": 2,
+    "memory-command": 3,
+    "theme-command": 3,
+    "colorterm-truecolor": 3
+  },
+  "hasCompletedOnboarding": true,
+  "firstStartTime": "2026-06-11T13:17:23.620Z",
+  "opusProMigrationComplete": true,
+  "sonnet1m45MigrationComplete": true,
+  "seenNotifications": {
+    "sudo-npm-install": 1
+  },
+  "migrationVersion": 13,
+  "userID": "f3283409c8f4fc27e5e78c49fe1ebdbe502a1be7dc260fa6334e4ca637057d65",
+  "changelogLastFetched": 1781183850940,
+  "lastReleaseNotesSeen": "2.1.168",
+  "projects": {
+    "/home/agent": {
+      "allowedTools": [],
+      "mcpContextUris": [],
+      "mcpServers": {},
+      "enabledMcpjsonServers": [],
+      "disabledMcpjsonServers": [],
+      "hasTrustDialogAccepted": true,
+      "projectOnboardingSeenCount": 1,
+      "hasClaudeMdExternalIncludesApproved": false,
+      "hasClaudeMdExternalIncludesWarningShown": false,
+      "exampleFiles": [],
+      "lastGracefulShutdown": true,
+      "lastVersionBase": "2.1.168",
+      "lastCost": 0.03754175,
+      "lastAPIDuration": 10807,
+      "lastAPIDurationWithoutRetries": 10799,
+      "lastToolDuration": 0,
+      "lastDuration": 34925,
+      "lastLinesAdded": 0,
+      "lastLinesRemoved": 0,
+      "lastTotalInputTokens": 18,
+      "lastTotalOutputTokens": 204,
+      "lastTotalCacheCreationInputTokens": 203,
+      "lastTotalCacheReadInputTokens": 62166,
+      "lastTotalWebSearchRequests": 0,
+      "lastFpsAverage": 5.82,
+      "lastFpsLow1Pct": 33.37,
+      "lastModelUsage": {
+        "qwen3.7-max": {
+          "inputTokens": 18,
+          "outputTokens": 204,
+          "cacheReadInputTokens": 62166,
+          "cacheCreationInputTokens": 203,
+          "webSearchRequests": 0,
+          "costUSD": 0.03754175
+        }
+      },
+      "lastSessionId": "72b32e42-ab2d-418a-a014-2177e6f233f2",
+      "lastSessionMetrics": {
+        "frame_duration_ms_count": 193,
+        "frame_duration_ms_min": 0.1542090000002645,
+        "frame_duration_ms_max": 36.678867999999966,
+        "frame_duration_ms_avg": 1.486123911916984,
+        "frame_duration_ms_p50": 0.901107999998203,
+        "frame_duration_ms_p95": 3.1665423999991607,
+        "frame_duration_ms_p99": 17.477765919999776
+      }
+    }
+  },
+  "opus48LaunchSeenCount": 3,
+  "tipLifetimeShownCounts": {
+    "new-user-warmup": 1,
+    "plan-mode-for-complex-tasks": 1,
+    "memory-command": 1,
+    "theme-command": 1,
+    "colorterm-truecolor": 1
+  },
+  "officialMarketplaceAutoInstallAttempted": true,
+  "officialMarketplaceAutoInstalled": true
+}
