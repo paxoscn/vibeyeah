@@ -142,9 +142,10 @@ pub async fn set_org_property(
             active.k8s_namespace = Set(v.to_string());
         }
         "image_pull_secret" => active.image_pull_secret = Set(opt(value)),
+        "k8s_kubeconfig" => active.k8s_kubeconfig = Set(opt(value)),
         _ => {
             return Err(anyhow!(
-                "不支持的属性：{key}（支持：openai_base_url / openai_api_key / openai_model / k8s_namespace / image_pull_secret）"
+                "不支持的属性：{key}（支持：openai_base_url / openai_api_key / openai_model / k8s_namespace / image_pull_secret / k8s_kubeconfig）"
             ))
         }
     }

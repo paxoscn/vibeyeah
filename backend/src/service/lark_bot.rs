@@ -77,6 +77,7 @@ struct SenderId {
 
 #[derive(Debug, Deserialize)]
 struct Message {
+    message_id: String,
     message_type: String,
     content: String,
     chat_type: String,
@@ -92,6 +93,11 @@ struct Chat {
 #[derive(Debug, Deserialize)]
 struct TextContent {
     text: String,
+}
+
+#[derive(Debug, Deserialize)]
+struct FileContent {
+    file_key: String,
 }
 
 // ── 启动入口：遍历所有配置了飞书应用的组织 ────────────────────────────────────
@@ -237,6 +243,37 @@ async fn handle_payload(
         }
     };
 
+    let tenant_key = envelope.header.tenant_key.clone().unwrap_or_default();
+    let sender_open_id = envelope.event.sender.sender_id.open_id.clone();
+    let (receive_id, receive_id_type) = resolve_target(&envelope.event);
+
+    if envelope.event.message.message_type == "file" {
+        let file_content: FileContent =
+            match serde_json::from_str(&envelope.event.message.content) {
+                Ok(c) => c,
+                Err(e) => {
+                    tracing::warn!("[{}] 无法解析文件消息: {e}", cred.org_name);
+                    return Ok(());
+                }
+            };
+        tracing::info!(
+            "[{}] 收到文件: tenant={} file_key={}",
+            cred.org_name,
+            tenant_key,
+            file_content.file_key
+        );
+        return handle_file(
+            db,
+            cred,
+            &sender_open_id,
+            &envelope.event.message.message_id,
+            &file_content.file_key,
+            &receive_id,
+            receive_id_type,
+        )
+        .await;
+    }
+
     if envelope.event.message.message_type != "text" {
         return Ok(());
     }
@@ -250,9 +287,6 @@ async fn handle_payload(
         return Ok(());
     }
 
-    let tenant_key = envelope.header.tenant_key.clone().unwrap_or_default();
-    let (receive_id, receive_id_type) = resolve_target(&envelope.event);
-
     tracing::info!(
         "[{}] 收到消息: tenant={} text={:?}",
         cred.org_name,
@@ -260,7 +294,6 @@ async fn handle_payload(
         text
     );
 
-    let sender_open_id = envelope.event.sender.sender_id.open_id.clone();
     if text.trim().replace("\\", "/") == "/add" {
         handle_add(
             db,
@@ -793,6 +826,163 @@ async fn handle_chat(
     Ok(())
 }
 
+// ── 文件上传处理：Owner 上传名为 "config" 的文件更新组织 k8s_kubeconfig ──────
+
+async fn handle_file(
+    db: &DatabaseConnection,
+    cred: &LarkAppCred,
+    sender_open_id: &str,
+    message_id: &str,
+    file_key: &str,
+    receive_id: &str,
+    receive_id_type: ReceiveIdType,
+) -> Result<()> {
+    let token = fetch_token(cred).await?;
+
+    // 校验：必须是组织 Owner
+    let member = org_member::Entity::find()
+        .filter(org_member::Column::OrgId.eq(cred.org_id))
+        .filter(org_member::Column::LarkOpenId.eq(sender_open_id))
+        .one(db)
+        .await?;
+    let member = match member {
+        Some(m) => m,
+        None => {
+            let _ = send_text(
+                &token,
+                cred,
+                receive_id,
+                receive_id_type,
+                "无法识别你的成员身份，请先发送 /add 加入组织",
+            )
+            .await;
+            return Ok(());
+        }
+    };
+    if !matches!(member.role, org_member::OrgRole::Owner) {
+        let _ = send_text(
+            &token,
+            cred,
+            receive_id,
+            receive_id_type,
+            "只有组织的 Owner 才能上传配置文件更新 kubeconfig",
+        )
+        .await;
+        return Ok(());
+    }
+
+    // 下载文件内容并获取文件名
+    let (file_name, file_bytes) = match download_file_from_lark(&token, message_id, file_key).await {
+        Ok(f) => f,
+        Err(e) => {
+            tracing::error!("[{}] 下载文件失败: {e}", cred.org_name);
+            let _ = send_text(
+                &token,
+                cred,
+                receive_id,
+                receive_id_type,
+                &format!("❌ 下载文件失败：{e}"),
+            )
+            .await;
+            return Ok(());
+        }
+    };
+
+    // 仅处理名为 "config" 的文件（不含扩展名或包含扩展名均接受以 "config" 开头）
+    let file_stem = std::path::Path::new(&file_name)
+        .file_stem()
+        .and_then(|s| s.to_str())
+        .unwrap_or(&file_name);
+    if file_stem != "config" {
+        tracing::info!(
+            "[{}] 忽略非 config 文件: file_name={}",
+            cred.org_name,
+            file_name
+        );
+        return Ok(());
+    }
+
+    // Base64 编码文件内容
+    use base64::{engine::general_purpose::STANDARD, Engine as _};
+    let kubeconfig_b64 = STANDARD.encode(&file_bytes);
+
+    // 更新组织 k8s_kubeconfig
+    let org = organization::Entity::find_by_id(cred.org_id)
+        .one(db)
+        .await?
+        .ok_or_else(|| anyhow::anyhow!("组织不存在: {}", cred.org_id))?;
+    let mut active: organization::ActiveModel = org.into();
+    active.k8s_kubeconfig = Set(Some(kubeconfig_b64));
+    active.updated_at = Set(Utc::now().into());
+    active.update(db).await?;
+
+    let _ = send_text(
+        &token,
+        cred,
+        receive_id,
+        receive_id_type,
+        &format!(
+            "✅ 已更新组织 kubeconfig（来源文件：{file_name}，{} 字节）",
+            file_bytes.len()
+        ),
+    )
+    .await;
+
+    tracing::info!(
+        "[{}] Owner 上传 config 文件更新 k8s_kubeconfig: file_name={} size={}",
+        cred.org_name,
+        file_name,
+        file_bytes.len()
+    );
+    Ok(())
+}
+
+/// 从飞书服务器下载文件内容。
+/// 返回 (文件名, 文件字节内容)。
+async fn download_file_from_lark(
+    token: &str,
+    message_id: &str,
+    file_key: &str,
+) -> Result<(String, Vec<u8>)> {
+    let client = reqwest::Client::new();
+    let resp = client
+        .get(format!(
+            "https://open.feishu.cn/open-apis/im/v1/messages/{message_id}/resources/{file_key}"
+        ))
+        .query(&[("type", "file")])
+        .bearer_auth(token)
+        .send()
+        .await
+        .map_err(|e| anyhow::anyhow!("请求文件下载失败: {e}"))?;
+
+    if !resp.status().is_success() {
+        let status = resp.status();
+        let body = resp.text().await.unwrap_or_default();
+        return Err(anyhow::anyhow!(
+            "飞书文件下载失败 HTTP {status}: {body}"
+        ));
+    }
+
+    // 从 Content-Disposition 头提取文件名
+    let file_name = resp
+        .headers()
+        .get("content-disposition")
+        .and_then(|v| v.to_str().ok())
+        .and_then(|s| {
+            s.split("filename=")
+                .nth(1)
+                .map(|f| f.trim_matches(|c| c == '"' || c == '\'').to_string())
+        })
+        .unwrap_or_else(|| "config".to_string());
+
+    let bytes = resp
+        .bytes()
+        .await
+        .map_err(|e| anyhow::anyhow!("读取文件内容失败: {e}"))?;
+
+    Ok((file_name, bytes.to_vec()))
+}
+
 // ── set 命令：Owner 设置组织属性 ─────────────────────────────────────────────
 
 async fn handle_set(
@@ -814,9 +1004,10 @@ async fn handle_set(
             receive_id,
             receive_id_type,
             "用法：/set <key> <value>\n\
-             支持的 key：openai_base_url、openai_api_key、openai_model、k8s_namespace、image_pull_secret\n\
+             支持的 key：openai_base_url、openai_api_key、openai_model、k8s_namespace、image_pull_secret、k8s_kubeconfig\n\
              示例：/set openai_base_url https://api.openai.com\n\
-             （openai_base_url 请勿带 /v1 尾缀，系统会按需要自动补全）",
+             （openai_base_url 请勿带 /v1 尾缀，系统会按需要自动补全）\n\
+             （k8s_kubeconfig 建议通过上传名为 config 的文件来更新）",
         )
         .await;
         return Ok(());
