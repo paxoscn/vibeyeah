@@ -2,6 +2,7 @@
 ///
 /// 将共享模板 `{nas_root}/vibeyeah/configs/.hermes` 拷贝到
 /// `{nas_root}/vibeyeah/agents/{agent_dir}/users/{user_id}/home/.hermes`，
+/// 同时将 `.bashrc` 模板拷贝到用户 home（与 `.hermes` 平级），
 /// 跳过运行期状态（给新用户一个干净的起点）。拷贝完成后，把该用户的飞书网关凭据
 /// 与组织的 OpenAI 配置（`openai_base_url`/`openai_api_key`/`openai_model`）渲染进
 /// `.env` / `config.yaml`（见 `prepare_user_home`）。
@@ -82,6 +83,9 @@ pub fn prepare_user_home(
         .with_context(|| format!("创建用户 hermes 目录失败: {}", dest.display()))?;
 
     copy_hermes_tree(&template, &dest)?;
+
+    // 拷贝 .bashrc 到用户 home 目录（与 .hermes 平级）
+    copy_bashrc(nas_root, agent_dir, user_id)?;
 
     // 占位符替换：先收集飞书网关凭据，再收集组织级 OpenAI 配置；
     // 对模板文件逐一遍历替换（无对应占位符时内容不变，不写回）。
@@ -174,6 +178,45 @@ pub fn prepare_agent_claude_settings(
     Ok(())
 }
 
+/// 从共享模板拷贝 `.bashrc` 到用户 home 目录。
+///
+/// 模板路径：`{nas_root}/vibeyeah/configs/.bashrc`
+/// 目标路径：`{nas_root}/vibeyeah/agents/{agent_dir}/users/{user_id}/home/.bashrc`
+///
+/// 模板缺失时不报错（静默跳过），因为 `.bashrc` 并非运行必需。
+fn copy_bashrc(nas_root: &str, agent_dir: &str, user_id: &str) -> Result<()> {
+    let template = Path::new(nas_root)
+        .join("vibeyeah")
+        .join("configs")
+        .join(".bashrc");
+    if !template.is_file() {
+        tracing::warn!(
+            "[user_home] .bashrc 模板不存在，跳过拷贝: {}",
+            template.display()
+        );
+        return Ok(());
+    }
+
+    let dest = Path::new(nas_root)
+        .join("vibeyeah")
+        .join("agents")
+        .join(agent_dir)
+        .join("users")
+        .join(user_id)
+        .join("home")
+        .join(".bashrc");
+    // home 目录已在 prepare_user_home -> create_dir_all 时创建
+    std::fs::copy(&template, &dest)
+        .with_context(|| format!("拷贝 .bashrc 失败: {} -> {}", template.display(), dest.display()))?;
+
+    tracing::info!(
+        "[user_home] 已拷贝 .bashrc user={} -> {}",
+        user_id,
+        dest.display()
+    );
+    Ok(())
+}
+
 /// 是否跳过（运行期状态 / state.db*）
 fn skip_entry(name: &str) -> bool {
     SKIP_NAMES.iter().any(|s| *s == name) || name.starts_with("state.db")
@@ -234,6 +277,12 @@ mod tests {
              DASHSCOPE_API_KEY=__OPENAI_API_KEY__\nDASHSCOPE_BASE_URL=__OPENAI_BASE_URL__/v1\n",
         )
         .unwrap();
+        // .bashrc 模板（与 .hermes 平级，在 configs 下）
+        fs::write(
+            tmp.join("vibeyeah").join("configs").join(".bashrc"),
+            "# test .bashrc\nexport FOO=bar\n",
+        )
+        .unwrap();
         tpl
     }
 
@@ -283,6 +332,11 @@ mod tests {
         assert!(cfg.contains("default: qwen3.8-max"));
         assert!(cfg.contains("api_key: sk-abc123"));
         assert!(!cfg.contains("__OPENAI_"));
+        // .bashrc 被拷贝到用户 home（与 .hermes 平级）
+        let bashrc = dest.parent().unwrap().join(".bashrc");
+        assert!(bashrc.is_file());
+        let bashrc_content = fs::read_to_string(&bashrc).unwrap();
+        assert!(bashrc_content.contains("export FOO=bar"));
 
         let _ = fs::remove_dir_all(&tmp);
     }
