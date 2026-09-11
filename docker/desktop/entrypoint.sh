@@ -119,8 +119,6 @@ else
     echo "[desktop] started ${started} hermes gateway(s)"
 fi
 
-. "/opt/rust/cargo/env"
-
 echo "[desktop] ready. DISPLAY=${DISPLAY}"
 # PID 1 不等待任何子进程：任何进程（Xvfb/openbox/gateway）的退出都不应导致
 # entrypoint 结束、进而触发 pod 重启。用 sleep+wait 循环常驻；
