@@ -248,14 +248,14 @@ async fn handle_payload(
     let (receive_id, receive_id_type) = resolve_target(&envelope.event);
 
     if envelope.event.message.message_type == "file" {
-        let file_content: FileContent =
-            match serde_json::from_str(&envelope.event.message.content) {
-                Ok(c) => c,
-                Err(e) => {
-                    tracing::warn!("[{}] 无法解析文件消息: {e}", cred.org_name);
-                    return Ok(());
-                }
-            };
+        let file_content: FileContent = match serde_json::from_str(&envelope.event.message.content)
+        {
+            Ok(c) => c,
+            Err(e) => {
+                tracing::warn!("[{}] 无法解析文件消息: {e}", cred.org_name);
+                return Ok(());
+            }
+        };
         tracing::info!(
             "[{}] 收到文件: tenant={} file_key={}",
             cred.org_name,
@@ -872,7 +872,8 @@ async fn handle_file(
     }
 
     // 下载文件内容并获取文件名
-    let (file_name, file_bytes) = match download_file_from_lark(&token, message_id, file_key).await {
+    let (file_name, file_bytes) = match download_file_from_lark(&token, message_id, file_key).await
+    {
         Ok(f) => f,
         Err(e) => {
             tracing::error!("[{}] 下载文件失败: {e}", cred.org_name);
@@ -958,9 +959,7 @@ async fn download_file_from_lark(
     if !resp.status().is_success() {
         let status = resp.status();
         let body = resp.text().await.unwrap_or_default();
-        return Err(anyhow::anyhow!(
-            "飞书文件下载失败 HTTP {status}: {body}"
-        ));
+        return Err(anyhow::anyhow!("飞书文件下载失败 HTTP {status}: {body}"));
     }
 
     // 从 Content-Disposition 头提取文件名

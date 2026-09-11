@@ -206,8 +206,13 @@ fn copy_bashrc(nas_root: &str, agent_dir: &str, user_id: &str) -> Result<()> {
         .join("home")
         .join(".bashrc");
     // home 目录已在 prepare_user_home -> create_dir_all 时创建
-    std::fs::copy(&template, &dest)
-        .with_context(|| format!("拷贝 .bashrc 失败: {} -> {}", template.display(), dest.display()))?;
+    std::fs::copy(&template, &dest).with_context(|| {
+        format!(
+            "拷贝 .bashrc 失败: {} -> {}",
+            template.display(),
+            dest.display()
+        )
+    })?;
 
     tracing::info!(
         "[user_home] 已拷贝 .bashrc user={} -> {}",
