@@ -54,6 +54,11 @@ RUN npm install -g @anthropic-ai/claude-code
 # 一次系统级安装即可供 Pod 内所有用户使用；每个用户的数据在各自 HERMES_HOME
 RUN curl -fsSL https://hermes-agent.nousresearch.com/install.sh | bash -s -- --commit c4066091cacba42d5afdcceb0b5a87e515019e86
 
+ENV RUSTUP_HOME=/opt/rust/rustup
+ENV CARGO_HOME=/opt/rust/cargo
+ENV PATH="$CARGO_HOME/bin:$PATH"
+RUN curl --proto '=https' --tlsv1.2 https://sh.rustup.rs -sSf | sh -s -- -y --no-modify-path --default-toolchain stable
+
 USER agent
 WORKDIR /home/agent
 
@@ -63,8 +68,6 @@ RUN sudo apt install -y openjdk-8-jdk
 # sudo update-alternatives --config java
 # sudo update-alternatives --config javac
 # sudo update-alternatives --config javadoc
-RUN curl --proto '=https' --tlsv1.2 https://sh.rustup.rs -sSf | sh -s -- -y
-ENV PATH="/home/agent/.cargo/bin:${PATH}"
 
 ENV PATH="/home/agent/.local/bin:${PATH}"
 RUN curl -LsSf https://astral.sh/uv/install.sh | sh
