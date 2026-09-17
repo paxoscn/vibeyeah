@@ -49,6 +49,52 @@ under a Rust (`axum`/`sea-orm`/`kube`) control plane.
    teams that coordinate over Feishu (agent-to-agent, A2A), so several specialized agents
    collaborate on one complex task.
 
+## Open source vs. closed-source agent runtimes: enterprise data security
+
+Closed-source agent runtimes are usually **vendor-hosted**: using them means handing your
+data and credentials to someone else's service, and trusting a binary you cannot inspect.
+VibeYeah takes the opposite stance — the whole runtime (control plane **and** the agents'
+sandboxes) is **Apache-2.0 and self-hosted inside your intranet**, so its security
+properties are things you can *verify and enforce* instead of things you take on faith.
+
+| | Closed-source / vendor-hosted runtime | VibeYeah |
+| --- | --- | --- |
+| Where conversations, files, memory and skills live | Vendor infrastructure (typically) | **Your own NAS** (RWX PVC) and your own cluster |
+| Can you see what leaves the network? | No — binary only | **Yes** — read the source, grep every outbound call |
+| Model & API keys | Often held by the vendor | **Yours** — stored in your database, sent only to the endpoint you configure |
+| Deployment location | Vendor cloud / SaaS | Your intranet, private VPC, **or fully offline** |
+| Continuity / exit | Subscription, feature gating, vendor roadmap | Apache-2.0: **no expiry, no activation, fork if needed** |
+| Fixing a vulnerability | Wait for a vendor release | Patch it yourself and ship it the same day |
+
+Concretely, in VibeYeah:
+
+- **Data stays put.** Agent conversations, skills, memory, browser state and files live on
+  the shared NAS you mount (`/data/nas`) and in your own PostgreSQL — not in a vendor's
+  cloud. The control plane ships with **no telemetry, no analytics and no activation
+  callbacks**; the only outbound endpoints are the ones *you* configure: Feishu
+  (`open.feishu.cn` / `accounts.feishu.cn`), WeChat, and your LLM endpoint.
+- **Auditable by construction.** Every outbound call site is plain Rust you can read and
+  grep before you deploy — "we don't send your data anywhere" becomes a fact you can
+  check, not a promise you have to trust.
+- **Bring your own model.** The LLM endpoint, key and model name are per-organization
+  settings in *your* database (`/set openai_base_url …`), so prompts and business data go
+  straight from your cluster to the model endpoint you chose — no third-party relay.
+- **Isolation at the depth you need.** Each user gets their own Linux account and an
+  isolated `HERMES_HOME`; each organization gets its own NAS root, K8s namespace and
+  kubeconfig. Layer your own `NetworkPolicy`, image baselines and audit logging on top,
+  and pin images you built yourself.
+- **Runs where your rules allow.** Intranet, private VPC, or an air-gapped network —
+  build a self-contained tarball with `scripts/package.sh` and ship it to machines that
+  never reach the public internet.
+- **Security work is never queued behind a vendor.** `SECURITY.md` documents a private
+  vulnerability-reporting process, and the Apache-2.0 license lets you harden, patch and
+  redeploy immediately — including for the changes no vendor would prioritize for you.
+
+> Open source is not a security guarantee by itself: an agent runtime is a high-privilege
+> workload and you still have to harden it (see [Security](#security)). What open source
+> gives you is the ability to **verify** those protections, **enforce** them at the
+> boundary you own, and **fix** them without asking permission.
+
 ## Architecture
 
 ```
