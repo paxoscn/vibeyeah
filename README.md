@@ -34,7 +34,7 @@ under a Rust (`axum`/`sea-orm`/`kube`) control plane.
 3. **Deployed in the enterprise intranet — safe internal access & inbound triggers.**
    Sandboxes run inside your intranet / private VPC, so agents can **securely reach
    internal systems** (browser, terminal, files with your credentials), and internal
-   systems can **hand agents tasks directly** via webhooks, `/callback/{skill}/{user_id}`,
+   systems can **hand agents tasks directly** via webhooks, `/callback/{org_id}/{skill}/{user_id}`,
    cron, or CI.
 4. **Skills / knowledge / memory / environment context — centrally managed, iterated,
    distributed.** Agent skills, knowledge base, memory and environment context are
@@ -232,7 +232,6 @@ restart the backend to apply. `DATABASE_URL` accepts PostgreSQL or SQLite
 | `pod_sync_interval_secs` | `30` | Pod status sync interval. |
 | `desktop_image` / `sidecar_image` | `vibeyeah/*:latest` | Agent desktop / WebRTC sidecar images. |
 | `webrtc_base_url` | `http://localhost:8889` | Base URL for live desktop viewing. |
-| `nas_mount_root` | `/data/nas` | NAS mount point used by the backend when preparing user homes. |
 | `nas_pvc_name` | `vibeyeah-nas-pvc` | Shared NAS PVC name mounted into agent pods. |
 | `hermes_exec_timeout_secs` | `900` | Timeout for callback-triggered in-pod hermes runs. |
 | `callback_token` | *(empty)* | If set, `/callback/...` requires `X-Callback-Token` (or `?token=`). |
@@ -242,17 +241,24 @@ The **LLM the agents use** (`openai_base_url` / `openai_api_key` / `openai_model
 a global `settings` key — the bot owner sets it at runtime with `/set` in Feishu (defaults
 empty). `openai_base_url` should **not** include a `/v1` suffix.
 
+The **NAS mount root** (`organizations.nas_mount_root`) is per-organization too: it is set
+to `<backend cwd>/data/nas` when the organization is created (inside a container whose cwd
+is `/` that is `/data/nas`, matching the manifest). Creation also makes sure the directory
+exists and seeds `vibeyeah/configs` from the repo's `docker/desktop/configs` when that
+directory is still missing.
+
 ## External Callback Routing
 
 Any external system can trigger a user's skill:
 
 ```
-GET|POST /callback/{skill}/{user_id}?foo=bar
+GET|POST /callback/{org_id}/{skill}/{user_id}?foo=bar
 ```
 
-The backend finds agent(s) that have `skill` installed for `user_id` under
-`agents/<agent>/users/<user_id>/home/.hermes/skills/**/<skill>`, returns `202`
-immediately, then invokes hermes inside the agent pod (as that user) with the
+The backend looks up the organization `org_id` (404 if unknown) and scans **its** NAS
+root — `organizations.nas_mount_root` — for agent(s) that have `skill` installed for
+`user_id` under `agents/<agent>/users/<user_id>/home/.hermes/skills/**/<skill>`, returns
+`202` immediately, then invokes hermes inside the agent pod (as that user) with the
 skill name, query params, and request body — trying candidate agents in order
 until one succeeds. Protect it with `CALLBACK_TOKEN` in any reachable network.
 

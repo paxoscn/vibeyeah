@@ -37,6 +37,9 @@ pub struct Model {
     pub openai_api_key: Option<String>,
     /// 可选：组织级 OpenAI 兼容 LLM 模型名
     pub openai_model: Option<String>,
+    /// 该组织的 NAS 挂载根目录（创建组织时按后端 cwd 生成）；
+    /// 为 None 时回退默认 `/data/nas`（历史组织）
+    pub nas_mount_root: Option<String>,
     pub created_by: Option<Uuid>,
     pub created_at: DateTimeWithTimeZone,
     pub updated_at: DateTimeWithTimeZone,

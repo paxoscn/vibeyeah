@@ -4,6 +4,7 @@ pub mod callback;
 pub mod k8s;
 pub mod lark_bot;
 pub mod lark_qr;
+pub mod nas;
 pub mod organization;
 pub mod sync;
 pub mod user_home;

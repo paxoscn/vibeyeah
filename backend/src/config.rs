@@ -17,8 +17,6 @@ pub struct Config {
     pub lark_app_secret: String,
     pub k8s_namespace: String,
     pub pod_sync_interval_secs: u64,
-    /// NAS 在 backend 容器内的挂载根目录（与 K8s Pod 保持一致）
-    pub nas_mount_root: String,
     /// 回调路由在 pod 内 oneshot 调用 hermes 的超时（秒）
     pub hermes_exec_timeout_secs: u64,
     /// 外部回调接口的可选共享密钥；为空则不校验
@@ -44,7 +42,6 @@ fn defaults() -> Config {
         lark_app_secret: String::new(),
         k8s_namespace: "default".into(),
         pod_sync_interval_secs: 30,
-        nas_mount_root: "/data/nas".into(),
         hermes_exec_timeout_secs: 900,
         callback_token: String::new(),
         desktop_image: "vibeyeah/desktop:latest".into(),
@@ -99,9 +96,6 @@ impl Config {
         }
         if let Some(v) = get("pod_sync_interval_secs") {
             self.pod_sync_interval_secs = v.parse().unwrap_or(30);
-        }
-        if let Some(v) = get("nas_mount_root") {
-            self.nas_mount_root = v;
         }
         if let Some(v) = get("hermes_exec_timeout_secs") {
             self.hermes_exec_timeout_secs = v.parse().unwrap_or(900);

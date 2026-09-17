@@ -8,7 +8,9 @@ threat model and the liability disclaimer.
 
 - A **Kubernetes** cluster (1.24+) and `kubectl` access.
 - A **ReadWriteMany** storage class / volume (e.g. NFS, NAS) for the shared
-  `vibeyeah` PVC. Both the backend and agent pods mount it at `/data/nas`.
+  `vibeyeah` PVC. Both the backend and agent pods mount it at `/data/nas`
+  (the backend reaches the same tree through the per-organization
+  `nas_mount_root` it sets at organization creation).
 - **PostgreSQL** reachable from the backend (or use SQLite for a single-node
   trial — see [`README`](../README.md#configuration)).
 - A container **registry** for the backend, desktop, and (optional) sidecar
@@ -45,6 +47,13 @@ Mount your RWX volume and seed the shared template:
 mkdir -p <nas>/vibeyeah
 cp -a docker/desktop/configs/. <nas>/vibeyeah/configs/
 ```
+
+Creating an organization already does this automatically — the backend sets
+`organizations.nas_mount_root` to `<backend cwd>/data/nas` (i.e. `/data/nas` in
+a container whose cwd is `/`), creates the directory, and seeds
+`vibeyeah/configs` from the repo's `docker/desktop/configs` when it is missing.
+Seeding by hand is still useful to pre-stage a volume or to run against an
+offline host.
 
 Leave the seed config as-is — the committed copies contain **placeholders only**
 (`__OPENAI_*__` / `__LARK_*__`). The backend renders the real LLM credentials
@@ -113,7 +122,7 @@ notifies you and you can start chatting with your agent.
 
 ## 6. (Optional) External callbacks
 
-Expose `/callback/{skill}/{user_id}` to trigger a user's skill from external
+Expose `/callback/{org_id}/{skill}/{user_id}` to trigger a user's skill from external
 systems. **Always** set `CALLBACK_TOKEN` and require it
 (`X-Callback-Token` header or `?token=`) when the endpoint is reachable beyond a
 trusted network.

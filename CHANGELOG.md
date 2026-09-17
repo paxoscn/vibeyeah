@@ -14,6 +14,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `CHANGELOG`, hardened `.gitignore`, GitHub Actions CI, and `docs/`.
 - Removed committed secrets and customer/internal content from the repository;
   seed configs now ship with placeholders only.
+- **Per-organization NAS mount root** (`organizations.nas_mount_root`):
+  creating an organization fills it with `<backend cwd>/data/nas`, makes sure
+  the directory exists, and seeds `vibeyeah/configs` from the repository's
+  `docker/desktop/configs` when it is still missing.
 
 ### Changed
 - Restructured the backend as a reusable **core library** (`vibeyeah-core`)
@@ -26,6 +30,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   scan-to-register QR code (skippable; non-interactive runs only log).
 - Configuration moved from environment variables to the database `settings`
   table (only `DATABASE_URL` / `BIND_ADDR` remain env-driven).
+- `nas_mount_root` is no longer a global `settings` key — it now lives on the
+  organization; organizations created before the migration fall back to
+  `/data/nas`.
+- **Breaking**: the external callback route is now
+  `GET/POST /callback/{org_id}/{skill}/{user_id}` — the organization id selects
+  the NAS root that is scanned. The old `/callback/{skill}/{user_id}` path
+  returns 404; external callers must add the organization id.
 
 ## [0.1.0]
 

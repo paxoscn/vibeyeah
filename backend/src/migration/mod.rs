@@ -19,6 +19,7 @@ mod m20240017_agents_add_wechat_fields;
 mod m20240018_orgs_add_git_config;
 mod m20240019_create_settings;
 mod m20240020_orgs_add_openai_fields;
+mod m20240021_orgs_add_nas_mount_root;
 
 pub struct Migrator;
 
@@ -45,6 +46,7 @@ impl MigratorTrait for Migrator {
             Box::new(m20240018_orgs_add_git_config::Migration),
             Box::new(m20240019_create_settings::Migration),
             Box::new(m20240020_orgs_add_openai_fields::Migration),
+            Box::new(m20240021_orgs_add_nas_mount_root::Migration),
         ]
     }
 }

@@ -68,9 +68,9 @@ pub fn core_router(state: AppState) -> Router {
         .route("/api/auth/send-code", post(api::auth::send_code))
         .route("/api/auth/phone-login", post(api::auth::phone_login))
         .route("/api/auth/lark-login", post(api::auth::lark_login))
-        // 外部 agent 调用路由：按技能与用户回调，转发到 agent pod 内的 hermes
+        // 外部 agent 调用路由：按企业、技能与用户回调，转发到 agent pod 内的 hermes
         .route(
-            "/callback/{skill}/{user_id}",
+            "/callback/{org_id}/{skill}/{user_id}",
             get(api::callback::callback).post(api::callback::callback),
         )
         .route("/health", get(|| async { "ok" }));

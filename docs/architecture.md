@@ -30,7 +30,7 @@ binary. Responsibilities:
 - **Feishu bot** (openlark, long-lived WebSocket): handles `/add` (agent
   provisioning), `/set` (owner-only LLM configuration), and chat.
 - **WeChat** provisioning (QR-based credential capture).
-- **External callback routing**: `/callback/{skill}/{user_id}` →
+- **External callback routing**: `/callback/{org_id}/{skill}/{user_id}` →
   `service::callback`.
 - **User home provisioning**: on `/add`, `service::user_home::prepare_user_home`
   seeds the user's NAS home and renders credentials into it before the workload
@@ -93,7 +93,9 @@ The user's messages reach their agent's hermes gateway directly via Feishu
 traffic does not transit the backend.
 
 ### External callback
-`GET/POST /callback/{skill}/{user_id}` → backend scans the NAS for agents that
+`GET/POST /callback/{org_id}/{skill}/{user_id}` → backend resolves the
+organization (404 if unknown) and scans **that organization's** NAS root
+(`organizations.nas_mount_root`) for agents that
 have `skill` installed for `user_id`, returns `202`, then (in the background)
 runs `hermes chat -q <prompt> --quiet -s <skill>` inside the candidate agent
 pods **as that user** (via `HERMES_HOME` and that user's Linux account),

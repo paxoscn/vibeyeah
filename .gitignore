@@ -36,6 +36,11 @@ venv/
 *.sqlite
 *.sqlite3
 
+# ── 本地 NAS 根目录（创建组织时按后端 cwd 生成 <cwd>/data/nas） ───────────────
+# 从仓库根目录运行后端时是 /data/，`cargo test`（cwd=backend/）时是 /backend/data/
+/data/
+/backend/data/
+
 # ── hermes runtime state (regenerated at runtime; never commit) ───────────────
 **/.hermes/state.db
 **/.hermes/state.db-*

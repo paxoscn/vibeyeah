@@ -6,17 +6,21 @@ use axum::{
     Extension, Json,
 };
 
-use crate::{service::callback as cb, AppState};
+use sea_orm::EntityTrait;
+use uuid::Uuid;
 
-/// GET/POST /callback/{skill}/{user_id}?foobar=...
+use crate::{entity::organization, service::callback as cb, AppState};
+
+/// GET/POST /callback/{org_id}/{skill}/{user_id}?foobar=...
 ///
 /// 外部 agent 调用路由：
-/// 1. 在 NAS 上找到为该 `user_id` 安装了 `skill` 的所有 agent；
-/// 2. 命中即记录日志并返回成功（202），随后后台以该用户身份调用 agent pod 内的 hermes；
-/// 3. 未命中任何 agent 时返回 404。
+/// 1. 按 `org_id` 取该企业（其 NAS 根目录决定扫描范围），企业不存在返回 404；
+/// 2. 在该企业的 NAS 上找到为 `user_id` 安装了 `skill` 的所有 agent；
+/// 3. 命中即记录日志并返回成功（202），随后后台以该用户身份调用 agent pod 内的 hermes；
+/// 4. 未命中任何 agent 时返回 404。
 pub async fn callback(
     Extension(state): Extension<AppState>,
-    Path((skill, user_id)): Path<(String, String)>,
+    Path((org_id, skill, user_id)): Path<(Uuid, String, String)>,
     Query(params): Query<Vec<(String, String)>>,
     headers: HeaderMap,
     body: Bytes,
@@ -62,8 +66,30 @@ pub async fn callback(
         }
     }
 
+    // 取企业：其 NAS 根目录决定本次扫描范围（企业级存储，见 service::nas）
+    let org = match organization::Entity::find_by_id(org_id)
+        .one(&state.db)
+        .await
+    {
+        Ok(Some(org)) => org,
+        Ok(None) => {
+            tracing::warn!("[callback] 企业不存在 org={}", org_id);
+            return (
+                StatusCode::NOT_FOUND,
+                Json(serde_json::json!({"error": "企业不存在"})),
+            );
+        }
+        Err(e) => {
+            tracing::error!("[callback] 查询企业失败 org={}: {}", org_id, e);
+            return (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                Json(serde_json::json!({"error": "查询企业失败"})),
+            );
+        }
+    };
+
     // 扫描 NAS（阻塞式文件 IO，放到阻塞线程执行）
-    let nas_root = state.config.nas_mount_root.clone();
+    let nas_root = crate::service::nas::resolve(&org);
     let scan_user = user_id.clone();
     let scan_skill = skill.clone();
     let agent_dirs = match tokio::task::spawn_blocking(move || {

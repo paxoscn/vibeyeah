@@ -436,6 +436,10 @@ mod tests {
             .await
             .expect("创建首个组织失败");
         assert_eq!(org.id.to_string(), DEFAULT_ORG_ID);
+        // 创建组织时按后端 cwd 填充 NAS 根目录，并落盘建出该目录
+        let nas_root = org.nas_mount_root.as_deref().expect("应填充 NAS 根目录");
+        assert!(nas_root.ends_with("data/nas"), "NAS 根目录: {nas_root}");
+        assert!(std::path::Path::new(nas_root).is_dir(), "NAS 根目录未创建");
 
         use sea_orm::{ColumnTrait, QueryFilter};
         let owner_id: uuid::Uuid = DEFAULT_OWNER_ID.parse().unwrap();

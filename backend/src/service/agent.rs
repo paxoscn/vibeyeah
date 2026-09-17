@@ -137,7 +137,7 @@ pub async fn create_agent(
     // 拷贝完成后会把组织的 OpenAI 配置（base_url/api_key/model）渲染进
     // `.hermes/.env`、`.hermes/config.yaml` 与 `.claude/settings.json`。
     let agent_dir = k8s::agent_workload_name(&agent_id);
-    let prep_nas_root = config.nas_mount_root.clone();
+    let prep_nas_root = crate::service::nas::resolve(&org);
     let prep_user_id = input.user_id.to_string();
     let prep_lark_id = input.lark_app_id.clone();
     let prep_lark_secret = input.lark_app_secret.clone();

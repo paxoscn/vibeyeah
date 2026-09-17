@@ -7,6 +7,7 @@ use uuid::Uuid;
 
 use crate::entity::user::LoginProvider;
 use crate::entity::{org_member, organization, user};
+use crate::service::nas;
 
 /// 首个（默认）组织的固定 UUID。
 ///
@@ -31,6 +32,9 @@ pub async fn get_default_org(db: &DatabaseConnection) -> Result<Option<organizat
 
 /// 交互式启动引导专用：先创建系统所有者用户，再创建首个组织（固定 `DEFAULT_ORG_ID`），
 /// 最后以 Owner 角色把该用户绑定到组织。
+///
+/// 组织落库后初始化其 NAS 根目录（`nas::default_mount_root()`，并在缺失时播种
+/// 共享配置模板）；该初始化是尽力而为的，失败只记 warning，不影响组织创建结果。
 pub async fn create_initial_org(
     db: &DatabaseConnection,
     name: &str,
@@ -43,6 +47,7 @@ pub async fn create_initial_org(
     // 2. 再创建组织
     let now = Utc::now();
     let org_id: Uuid = DEFAULT_ORG_ID.parse().unwrap();
+    let nas_mount_root = nas::default_mount_root();
     let org = organization::ActiveModel {
         id: Set(org_id),
         name: Set(name.to_string()),
@@ -60,6 +65,7 @@ pub async fn create_initial_org(
         openai_base_url: Set(None),
         openai_api_key: Set(None),
         openai_model: Set(None),
+        nas_mount_root: Set(Some(nas_mount_root.to_string_lossy().to_string())),
         created_by: Set(Some(owner.id)),
         created_at: Set(now.into()),
         updated_at: Set(now.into()),
@@ -68,6 +74,13 @@ pub async fn create_initial_org(
 
     // 3. 最后把所有者用户绑定为组织的 Owner（幂等）
     add_member(db, org_id, owner.id, org_member::OrgRole::Owner).await?;
+
+    // 4. 初始化 NAS 根目录（阻塞式文件 IO，放阻塞线程）；失败不影响组织创建
+    match tokio::task::spawn_blocking(move || nas::ensure_mount_root(&nas_mount_root)).await {
+        Ok(Ok(())) => {}
+        Ok(Err(e)) => tracing::warn!("初始化 NAS 根目录失败 org={org_id}: {e}"),
+        Err(e) => tracing::warn!("初始化 NAS 根目录任务异常 org={org_id}: {e}"),
+    }
 
     Ok(org)
 }

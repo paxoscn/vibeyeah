@@ -29,7 +29,7 @@
    或微信上即可驱动它（发送 `/add`，数秒内开通你的 agent），并可经 **WebRTC** 实时观看它操作。
 3. **部署于企业内网——安全访问内部系统，也接受内部系统触发。** 沙箱运行在你的内网 / 私有
    VPC 内，agent 因此能**安全访问内部系统**（以你的凭据操作浏览器 / 终端 / 文件）；内部系统
-   也能**直接把任务交给 agent**——通过 webhook、`/callback/{skill}/{user_id}`、定时任务或 CI。
+   也能**直接把任务交给 agent**——通过 webhook、`/callback/{org_id}/{skill}/{user_id}`、定时任务或 CI。
 4. **Skill / 知识库 / 记忆 / 环境上下文——集中管理、迭代与分发。** agent 的技能、知识库、
    记忆与环境上下文作为共享目录在 NAS 上统一管理，并**分发**到正确的 agent 与用户；agent
    状态支持 **git 同步**，使能力与行为得以**版本化迭代、可审计**。
@@ -198,7 +198,6 @@ PostgreSQL 或 SQLite（留空默认为 `sqlite://vibeyeah.db`）。
 | `pod_sync_interval_secs` | `30` | pod 状态同步间隔（秒）。 |
 | `desktop_image` / `sidecar_image` | `vibeyeah/*:latest` | agent 桌面 / WebRTC sidecar 镜像。 |
 | `webrtc_base_url` | `http://localhost:8889` | 桌面实时观看的基础 URL。 |
-| `nas_mount_root` | `/data/nas` | 后端准备用户 home 时使用的 NAS 根目录。 |
 | `nas_pvc_name` | `vibeyeah-nas-pvc` | 挂载进 agent pod 的共享 NAS PVC 名称。 |
 | `hermes_exec_timeout_secs` | `900` | 回调触发的 pod 内 hermes 运行超时（秒）。 |
 | `callback_token` | *（空）* | 若设置，`/callback/...` 需携带 `X-Callback-Token`（或 `?token=`）。 |
@@ -208,18 +207,23 @@ agent 使用的大模型（`openai_base_url` / `openai_api_key` / `openai_model`
 `settings` 项——由 Bot 管理员通过飞书 `/set` 在运行时设置（默认空）。`openai_base_url`
 **不要带 `/v1` 尾缀**。
 
+NAS 根目录（`organizations.nas_mount_root`）同样是企业级配置：创建企业时写入
+`<后端进程 cwd>/data/nas`（容器内 cwd 为 `/` 即 `/data/nas`，与部署清单一致），
+同时确保该目录存在，并在缺少 `vibeyeah/configs` 时从仓库 `docker/desktop/configs` 播种。
+
 ## 外部回调路由
 
 任意外部系统都可触发某个用户的技能：
 
 ```
-GET|POST /callback/{skill}/{user_id}?foo=bar
+GET|POST /callback/{org_id}/{skill}/{user_id}?foo=bar
 ```
 
-后端会在 `agents/<agent>/users/<user_id>/home/.hermes/skills/**/<skill>` 下找到为 `user_id`
-安装了 `skill` 的 agent，立即返回 `202`，随后在 agent pod 内（以该用户身份）调用 hermes，把
-技能名、query 参数与请求体传给它——并按顺序尝试候选 agent，直到某个成功为止。在任何可被访问
-的网络中，请用 `CALLBACK_TOKEN` 保护该端点。
+后端先按 `org_id` 找到对应的企业（不存在返回 `404`），再在该企业的 NAS 根目录
+（`organizations.nas_mount_root`）下的 `agents/<agent>/users/<user_id>/home/.hermes/skills/**/<skill>`
+找到为 `user_id` 安装了 `skill` 的 agent，立即返回 `202`，随后在 agent pod 内（以该用户身份）
+调用 hermes，把技能名、query 参数与请求体传给它——并按顺序尝试候选 agent，直到某个成功为止。
+在任何可被访问的网络中，请用 `CALLBACK_TOKEN` 保护该端点。
 
 ## 安全
 

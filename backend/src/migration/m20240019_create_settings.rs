@@ -13,7 +13,6 @@ const DEFAULT_SETTINGS: &[(&str, &str)] = &[
     ("lark_app_secret", ""),
     ("k8s_namespace", "default"),
     ("pod_sync_interval_secs", "30"),
-    ("nas_mount_root", "/data/nas"),
     ("hermes_exec_timeout_secs", "900"),
     ("callback_token", ""),
     ("desktop_image", "vibeyeah/desktop:latest"),

@@ -53,7 +53,7 @@ cluster. Treat every agent as a **high-privilege workload**:
   `NetworkPolicy`, resource limits, and (where your platform allows) a
   restrictive Pod Security standard. The desktop entrypoint creates per-user
   Linux accounts via passwordless `sudo`; understand this before deploying.
-- **Callback route**: `/callback/{skill}/{user_id}` is unauthenticated by
+- **Callback route**: `/callback/{org_id}/{skill}/{user_id}` is unauthenticated by
   default. In any reachable environment, set `CALLBACK_TOKEN` and require it,
   and restrict who can reach the endpoint.
 - **Least privilege**: Scope the LLM/API keys, platform bot permissions, and
