@@ -104,6 +104,7 @@ docker/
   desktop/  Agent workstation image (Ubuntu + hermes + tools) & entrypoint
   sidecar/  Optional WebRTC streaming sidecar (mediamtx)
 deploy/     Example Kubernetes manifests (deploy/test/)
+scripts/    `package.sh` — builds the backend and bundles it with the configs
 docs/       Architecture & deployment guides
 ```
 
@@ -123,15 +124,19 @@ docs/       Architecture & deployment guides
 
 ### Option A — Run a release binary (fastest)
 
-Download the latest release artifact (pick the one matching your OS/arch, e.g.
-`vibeyeah-linux-x86_64`) from the
-[Releases](https://github.com/paxoscn/vibeyeah/releases) page and run it in a terminal.
-**No configuration is required to start** — on first launch the backend uses a local SQLite
-file `./vibeyeah.db` (auto-created & migrated) and listens on `0.0.0.0:8080`:
+Download the latest release tarball (pick the one matching your OS/arch, e.g.
+`vibeyeah-0.1.0-linux-x86_64.tar.gz`) from the
+[Releases](https://github.com/paxoscn/vibeyeah/releases) page, extract it, and run the
+binary **from inside the extracted directory** — it locates the bundled
+`docker/desktop/configs` template, and creates its NAS root, relative to the current
+working directory. **No configuration is required to start** — on first launch the backend
+uses a local SQLite file `./vibeyeah.db` (auto-created & migrated) and listens on
+`0.0.0.0:8080`:
 
 ```bash
-chmod +x ./vibeyeah-linux-x86_64
-./vibeyeah-backend            # optionally: DATABASE_URL=postgres://... BIND_ADDR=0.0.0.0:8080
+tar -xzf vibeyeah-0.1.0-linux-x86_64.tar.gz
+cd vibeyeah-0.1.0-linux-x86_64
+./vibeyeah                     # optionally: DATABASE_URL=postgres://... BIND_ADDR=0.0.0.0:8080
 ```
 
 **1 · Initialize the deployment — the first-run wizard.** Because the database is empty,
@@ -191,11 +196,13 @@ Each returns `✅ 已设置 …`.
    cd backend && docker build -t <your-registry>/vibeyeah-backend:latest .
    ```
 
-2. **Prepare the NAS seed** — copy `docker/desktop/configs/` to
-   `<nas>/vibeyeah/configs/` so new agents/users can be seeded from it. The
-   committed configs contain **placeholders only** (`__OPENAI_*__` /
-   `__LARK_*__`); the real LLM / gateway values are rendered into the copies by
-   the backend at `/add`, so don't hand-edit secrets into the seed.
+2. **Prepare the NAS seed** — creating an organization already copies
+   `docker/desktop/configs/` to `<nas>/vibeyeah/configs/` when that directory is
+   missing (the organization's NAS root defaults to `<backend cwd>/data/nas`), so
+   manual seeding is only needed to pre-stage a volume. The committed configs
+   contain **placeholders only** (`__OPENAI_*__` / `__LARK_*__`); the real LLM /
+   gateway values are rendered into the copies by the backend at `/add`, so don't
+   hand-edit secrets into the seed.
 
 3. **Configure the backend** — set `DATABASE_URL` (PostgreSQL, or leave empty
    for a local SQLite file) and optionally `BIND_ADDR`. Copy
@@ -211,6 +218,17 @@ Each returns `✅ 已设置 …`.
 5. **Provision an agent** — in Feishu, message your bot **`/add`**, scan the QR
    code to authorize a Feishu app, and VibeYeah will create your agent pod. Then
    just chat with it.
+
+**Or build a release tarball** — `scripts/package.sh` builds the backend and bundles the
+binary with `docker/desktop/configs`, `.env.example`, the example manifests, and the
+changelog, so the extracted directory is self-contained (the binary finds the template and
+creates its NAS root relative to the working directory):
+
+```bash
+scripts/package.sh                 # -> dist/vibeyeah-<version>-<platform>[-<rev>].tar.gz (+ .sha256)
+scripts/package.sh --target x86_64-unknown-linux-musl   # cross-compile (rustup target add first)
+scripts/package.sh --help
+```
 
 For local development see [`CONTRIBUTING.md`](CONTRIBUTING.md).
 

@@ -34,6 +34,18 @@ docker push <registry>/vibeyeah-sidecar:latest
 cd backend && cargo build --release
 ```
 
+To ship the backend as a tarball instead — binary plus the shared config template
+it seeds from — use the packaging script (run from the repository root):
+
+```bash
+scripts/package.sh                # -> dist/vibeyeah-<version>-<platform>[-<rev>].tar.gz
+scripts/package.sh --target x86_64-unknown-linux-musl   # cross-compile
+```
+
+The archive's top directory contains `vibeyeah`, `docker/desktop/configs/`,
+`.env.example`, `deploy/`, and `CHANGELOG.md`; run the binary from inside that
+directory so it finds the template and creates its NAS root there.
+
 > The desktop image installs `hermes-agent` system-wide (as root) and runs its
 > entrypoint as root so it can create per-user Linux accounts. Review
 > `docker/desktop/Dockerfile` and `entrypoint.sh` before deploying.

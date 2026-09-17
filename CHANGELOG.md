@@ -14,6 +14,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `CHANGELOG`, hardened `.gitignore`, GitHub Actions CI, and `docs/`.
 - Removed committed secrets and customer/internal content from the repository;
   seed configs now ship with placeholders only.
+- `scripts/package.sh`: builds the backend and bundles the `vibeyeah` binary with
+  `docker/desktop/configs`, `.env.example`, the example manifests, and the
+  changelog into a versioned `.tar.gz` (plus a `.sha256`). Supports
+  `--target <triple>` for cross builds.
 - **Per-organization NAS mount root** (`organizations.nas_mount_root`):
   creating an organization fills it with `<backend cwd>/data/nas`, makes sure
   the directory exists, and seeds `vibeyeah/configs` from the repository's

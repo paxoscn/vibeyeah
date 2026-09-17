@@ -88,6 +88,7 @@ docker/
   desktop/  Agent 工作站镜像 (Ubuntu + hermes + 工具链) 与 entrypoint
   sidecar/  可选的 WebRTC 推流 sidecar (mediamtx)
 deploy/     Kubernetes 清单示例 (deploy/test/)
+scripts/    `package.sh`——构建后端并与配置模板一起打包
 docs/       架构与部署文档
 ```
 
@@ -105,14 +106,16 @@ docs/       架构与部署文档
 
 ### 方式 A：运行 Release 二进制（最快）
 
-从 [Releases](https://github.com/paxoscn/vibeyeah/releases) 页面下载最新的发布资产（按你的
-系统 / 架构选择，如 `vibeyeah-linux-x86_64`），在终端直接运行。**无需任何配置即可
-启动**——首次启动后端会使用当前目录的 SQLite 文件 `./vibeyeah.db`（自动创建并迁移），监听
-`0.0.0.0:8080`：
+从 [Releases](https://github.com/paxoscn/vibeyeah/releases) 页面下载最新的发布压缩包（按你的
+系统 / 架构选择，如 `vibeyeah-0.1.0-linux-x86_64.tar.gz`），解压后**在解压目录内**运行二进制
+——它按当前工作目录定位随包携带的 `docker/desktop/configs` 模板并创建 NAS 根目录。**无需任何
+配置即可启动**——首次启动后端会使用当前目录的 SQLite 文件 `./vibeyeah.db`（自动创建并迁移），
+监听 `0.0.0.0:8080`：
 
 ```bash
-chmod +x ./vibeyeah-linux-x86_64
-./vibeyeah-backend            # 可选：DATABASE_URL=postgres://... BIND_ADDR=0.0.0.0:8080
+tar -xzf vibeyeah-0.1.0-linux-x86_64.tar.gz
+cd vibeyeah-0.1.0-linux-x86_64
+./vibeyeah                    # 可选：DATABASE_URL=postgres://... BIND_ADDR=0.0.0.0:8080
 ```
 
 **1 · 初始化部署——首次运行向导。** 因数据库为空，二进制会进入交互式向导：
@@ -166,9 +169,10 @@ chmod +x ./vibeyeah-linux-x86_64
    cd backend && docker build -t <your-registry>/vibeyeah-backend:latest .
    ```
 
-2. **准备 NAS 种子**——把 `docker/desktop/configs/` 复制到 `<nas>/vibeyeah/configs/`，以便新
-   agent / 用户从中播种。仓库内这些配置**只含占位符**（`__OPENAI_*__` / `__LARK_*__`）；真实的
-   大模型 / 网关值会在 `/add` 时由后端渲染进副本（因此不要把密钥手工写进种子）。
+2. **准备 NAS 种子**——创建企业时后端已会自动把 `docker/desktop/configs/` 复制到
+   `<nas>/vibeyeah/configs/`（企业的 NAS 根目录默认是 `<后端 cwd>/data/nas`），因此手工播种
+   仅用于预置存储卷的场景。仓库内这些配置**只含占位符**（`__OPENAI_*__` / `__LARK_*__`）；
+   真实的大模型 / 网关值会在 `/add` 时由后端渲染进副本（因此不要把密钥手工写进种子）。
 
 3. **配置后端**——设置 `DATABASE_URL`（PostgreSQL；留空则用本地 SQLite），可选设置 `BIND_ADDR`。
    把 `backend/.env.example` 复制为 `backend/.env` 作模板。其余所有配置存于数据库 `settings`
@@ -179,6 +183,16 @@ chmod +x ./vibeyeah-linux-x86_64
 
 5. **开通 agent**——在飞书里给你的 bot 发送 **`/add`**，扫码授权一个飞书应用，VibeYeah 便会
    创建你的 agent pod。之后直接对话即可。
+
+**或构建发布压缩包**——`scripts/package.sh` 会构建后端，并把二进制与 `docker/desktop/configs`、
+`.env.example`、清单示例、CHANGELOG 一起打包，解压目录即自包含（二进制按工作目录找模板、创建
+NAS 根目录）：
+
+```bash
+scripts/package.sh                 # -> dist/vibeyeah-<版本>-<平台>[-<rev>].tar.gz（含 .sha256）
+scripts/package.sh --target x86_64-unknown-linux-musl   # 交叉编译（需先 rustup target add）
+scripts/package.sh --help
+```
 
 本地开发见 [`CONTRIBUTING.md`](CONTRIBUTING.md)。
 
