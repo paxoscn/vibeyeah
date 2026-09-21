@@ -9,11 +9,12 @@ By participating in this project you agree to abide by the
 ## Project Layout
 
 - `backend/` — Rust control plane (axum, sea-orm, kube).
-- `frontend/` — React + Vite + TypeScript web UI.
 - `docker/desktop/` — agent workstation image and `entrypoint.sh`.
 - `docker/sidecar/` — optional WebRTC streaming sidecar.
 - `deploy/` — example Kubernetes manifests and DB seed.
 - `docs/` — architecture and deployment guides.
+- `tools/` — developer tooling, not shipped. See `tools/quality-scorecard/` for
+  the TypeSafe-based code-quality scorecard.
 
 ## Development Setup
 
@@ -34,18 +35,6 @@ You will need a reachable PostgreSQL and, for full functionality, a Kubernetes
 cluster (or a kubeconfig). Many changes can be developed and unit-tested without
 a live cluster.
 
-### Frontend (Node)
-
-Requires Node.js 20+ and npm.
-
-```bash
-cd frontend
-npm ci
-npm run dev        # local dev server
-npm run build      # type-check (tsc) + production build
-npm run lint       # eslint
-```
-
 ### Agent image (Docker)
 
 ```bash
@@ -58,10 +47,9 @@ docker build -t vibeyeah-desktop:dev docker/desktop/
 1. **Create a branch** off `main` with a descriptive name, e.g.
    `feat/agent-restart` or `fix/callback-timeout`.
 2. **Keep changes focused.** One logical change per pull request.
-3. **Add or update tests** where practical (backend: `cargo test`; frontend:
-   keep `npm run build` and `npm run lint` green).
+3. **Add or update tests** where practical (backend: `cargo test`).
 4. **Match the surrounding style.** Rust: `cargo fmt` + `cargo clippy` clean.
-   Frontend: eslint clean. Shell: `bash -n` and prefer POSIX-friendly syntax.
+   Shell: `bash -n` and prefer POSIX-friendly syntax.
 5. **Update docs** (`README.md`, `docs/`, `CHANGELOG.md`) when you change
    behavior, configuration, or the public API.
 
