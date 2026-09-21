@@ -1,0 +1,4 @@
+# Run artifacts: raw judgments, metrics and the composed scorecard are
+# regenerated per run and are large. Commit a summary by hand if you want a
+# scorecard checked in as a record.
+out/
