@@ -78,6 +78,8 @@ RUN sudo /usr/local/lib/hermes-agent/venv/bin/python -m pip install lark-oapi --
 
 # For GIT
 RUN sudo apt install -y openssh-client
+# For protoc
+RUN sudo apt install -y protobuf-compiler
 
 # entrypoint 以 root 运行：需为每个用户创建 Linux 账户并 chown 其 NAS home
 USER root
