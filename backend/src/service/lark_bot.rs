@@ -622,6 +622,7 @@ async fn create_agent_step(
     };
 
     let input = agent::CreateAgentInput {
+        agent_id: None,
         name: agent_name,
         description: Some(format!("由飞书 /add 自动创建，组织：{}", cred.org_name)),
         system_prompt: None,
@@ -635,6 +636,8 @@ async fn create_agent_step(
         wechat_token: None,
         wechat_base_url: None,
         wechat_user_id: None,
+        // 控制面与本集群同源，直接写 NAS
+        config_bundle_url: None,
     };
 
     let agent_rec = match agent::create_agent(db, k8s, config, input).await {

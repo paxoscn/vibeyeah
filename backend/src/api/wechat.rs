@@ -108,6 +108,7 @@ pub async fn create_wechat_agent(
     };
 
     let input = CreateAgentInput {
+        agent_id: None,
         name: body.name,
         description: body.description,
         system_prompt: body.system_prompt,
@@ -121,6 +122,8 @@ pub async fn create_wechat_agent(
         wechat_token: Some(body.wechat_token),
         wechat_base_url: Some(body.wechat_base_url),
         wechat_user_id: Some(body.wechat_user_id),
+        // 控制面与本集群同源，直接写 NAS
+        config_bundle_url: None,
     };
 
     match service::agent::create_agent(&state.db, &state.k8s_client, &state.config, input).await {
