@@ -222,8 +222,11 @@ fn copy_bashrc(nas_root: &str, agent_dir: &str, user_id: &str) -> Result<()> {
     Ok(())
 }
 
-/// 是否跳过（运行期状态 / state.db*）
-fn skip_entry(name: &str) -> bool {
+/// 是否跳过（运行期状态 / state.db*）。
+///
+/// 公开给下游使用：控制面在集群外时由自己打包 `.hermes`，必须与这里的判定保持一致，
+/// 否则会把运行期状态（sessions / state.db）塞进配置包。
+pub fn skip_entry(name: &str) -> bool {
     SKIP_NAMES.iter().any(|s| *s == name) || name.starts_with("state.db")
 }
 

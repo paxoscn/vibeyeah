@@ -14,6 +14,11 @@ use crate::entity::{
 use crate::service::k8s;
 
 pub struct CreateAgentInput {
+    /// 由调用方预先生成的 agent id；`None` 时在内部生成。
+    ///
+    /// 之所以允许外部指定：控制面在集群外时需要**先**知道 agent 的 NAS 目录名
+    /// （`k8s::agent_workload_name`）才能打包配置包，而该名字由 id 推导。
+    pub agent_id: Option<Uuid>,
     pub name: String,
     pub description: Option<String>,
     pub system_prompt: Option<String>,
@@ -30,6 +35,10 @@ pub struct CreateAgentInput {
     pub wechat_token: Option<String>,
     pub wechat_base_url: Option<String>,
     pub wechat_user_id: Option<String>,
+    /// 配置投递方式：`Some(url)` 时由 Pod 的 init 容器从该 URL 拉取配置包（tar.gz，
+    /// 根为 `vibeyeah/`）解到 NAS，本进程**不再**直接写 NAS —— 用于控制面部署在集群外、
+    /// 或需要管理多个集群的场景。`None` 时沿用本地写 NAS 的既有行为。
+    pub config_bundle_url: Option<String>,
 }
 
 /// 创建 agent：校验成员资格 → 读取组织 k8s_namespace → 建记录 → 启动 Deployment
@@ -60,7 +69,7 @@ pub async fn create_agent(
         .await
         .map_err(|e| anyhow!("构建组织 K8s client 失败: {e}"))?;
     let now = Utc::now();
-    let agent_id = Uuid::new_v4();
+    let agent_id = input.agent_id.unwrap_or_else(Uuid::new_v4);
 
     let new_agent = agent::ActiveModel {
         id: Set(agent_id),
@@ -136,43 +145,48 @@ pub async fn create_agent(
     // 保证 Pod 启动后其 gateway / Claude Code 即可运行；失败则不创建 K8s 资源。
     // 拷贝完成后会把组织的 OpenAI 配置（base_url/api_key/model）渲染进
     // `.hermes/.env`、`.hermes/config.yaml` 与 `.claude/settings.json`。
-    let agent_dir = k8s::agent_workload_name(&agent_id);
-    let prep_nas_root = crate::service::nas::resolve(&org);
-    let prep_user_id = input.user_id.to_string();
-    let prep_lark_id = input.lark_app_id.clone();
-    let prep_lark_secret = input.lark_app_secret.clone();
-    let openai_cfg = crate::service::user_home::OpenAiConfig {
-        base_url: org.openai_base_url.clone().unwrap_or_default(),
-        api_key: org.openai_api_key.clone().unwrap_or_default(),
-        model: org.openai_model.clone().unwrap_or_default(),
-    };
-    let prep_result = match tokio::task::spawn_blocking(move || {
-        crate::service::user_home::prepare_user_home(
-            &prep_nas_root,
-            &agent_dir,
-            &prep_user_id,
-            prep_lark_id.as_deref(),
-            prep_lark_secret.as_deref(),
-            &openai_cfg,
-        )?;
-        crate::service::user_home::prepare_agent_claude_settings(
-            &prep_nas_root,
-            &agent_dir,
-            &openai_cfg,
-        )
-    })
-    .await
-    {
-        Ok(inner) => inner,
-        Err(join_err) => Err(anyhow!("准备用户 home 任务异常: {}", join_err)),
-    };
-    if let Err(e) = prep_result {
-        tracing::error!("准备用户 home 失败 agent={}: {}", agent_id, e);
-        let mut active: agent::ActiveModel = agent_rec.into();
-        active.pod_status = Set(PodStatus::Failed);
-        active.updated_at = Set(Utc::now().into());
-        active.update(db).await?;
-        return Err(e);
+    //
+    // 例外：控制面部署在集群外时（`config_bundle_url = Some`），本进程与目标集群的 NAS
+    // 不是同一个文件系统，改由 Pod 的 init 容器拉取配置包填充 NAS，这里跳过所有本地文件 IO。
+    if input.config_bundle_url.is_none() {
+        let agent_dir = k8s::agent_workload_name(&agent_id);
+        let prep_nas_root = crate::service::nas::resolve(&org);
+        let prep_user_id = input.user_id.to_string();
+        let prep_lark_id = input.lark_app_id.clone();
+        let prep_lark_secret = input.lark_app_secret.clone();
+        let openai_cfg = crate::service::user_home::OpenAiConfig {
+            base_url: org.openai_base_url.clone().unwrap_or_default(),
+            api_key: org.openai_api_key.clone().unwrap_or_default(),
+            model: org.openai_model.clone().unwrap_or_default(),
+        };
+        let prep_result = match tokio::task::spawn_blocking(move || {
+            crate::service::user_home::prepare_user_home(
+                &prep_nas_root,
+                &agent_dir,
+                &prep_user_id,
+                prep_lark_id.as_deref(),
+                prep_lark_secret.as_deref(),
+                &openai_cfg,
+            )?;
+            crate::service::user_home::prepare_agent_claude_settings(
+                &prep_nas_root,
+                &agent_dir,
+                &openai_cfg,
+            )
+        })
+        .await
+        {
+            Ok(inner) => inner,
+            Err(join_err) => Err(anyhow!("准备用户 home 任务异常: {}", join_err)),
+        };
+        if let Err(e) = prep_result {
+            tracing::error!("准备用户 home 失败 agent={}: {}", agent_id, e);
+            let mut active: agent::ActiveModel = agent_rec.into();
+            active.pod_status = Set(PodStatus::Failed);
+            active.updated_at = Set(Utc::now().into());
+            active.update(db).await?;
+            return Err(e);
+        }
     }
 
     match k8s::create_agent_deployment(
@@ -185,6 +199,7 @@ pub async fn create_agent(
         &config.nas_pvc_name,
         lark_env,
         wechat_env,
+        input.config_bundle_url.clone(),
     )
     .await
     {

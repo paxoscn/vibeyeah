@@ -68,6 +68,10 @@ const NAS_CONFIGS_SRC: &str = "/data/nas/vibeyeah/configs";
 
 /// 在 K8s 创建 agent 的 Deployment（单副本 desktop Pod）
 /// 返回 (deployment_name, namespace)
+///
+/// `config_bundle_url`：**控制面部署在集群外**时使用。为 `Some` 时会在最前面加一个
+/// init 容器，从该 URL 拉取配置包（tar.gz，根目录为 `vibeyeah/`）解到 `/data/nas`；
+/// 为 `None` 时沿用「控制面直接写 NAS」的既有行为。
 pub async fn create_agent_deployment(
     client: &Client,
     agent_id: &Uuid,
@@ -78,6 +82,7 @@ pub async fn create_agent_deployment(
     nas_pvc_name: &str,
     lark_env: Option<LarkEnv>,
     wechat_env: Option<WechatEnv>,
+    config_bundle_url: Option<String>,
 ) -> Result<(String, String)> {
     let name = agent_workload_name(agent_id);
     let api: Api<Deployment> = Api::namespaced(client.clone(), namespace);
@@ -288,6 +293,57 @@ chown -R 1000:1000 "{NAS_MOUNT_PATH}/vibeyeah/agents/{name}"
         ..Default::default()
     };
 
+    // 控制面在集群外时的配置投递：从对象存储拉取后端渲染好的配置包，解到 NAS。
+    // - 复用 desktop 镜像：节点上必然已缓存，且带 curl / tar
+    // - 必须排在 init-agent-configs 之前：后者会用 cp -a -n 从共享模板补齐 agent 目录
+    // - 幂等：写 marker 后 Pod 重启不再下载，避免覆盖 Agent 运行期数据
+    let mut init_containers: Vec<Container> = Vec::new();
+    if let Some(bundle_url) = config_bundle_url {
+        let fetch_script = format!(
+            r#"set -e
+AGENT_DIR="{NAS_MOUNT_PATH}/vibeyeah/agents/{name}"
+MARKER="$AGENT_DIR/.config-bundle-applied"
+if [ -f "$MARKER" ]; then
+    echo "[init-fetch] config bundle already applied, skip"
+    exit 0
+fi
+if [ -z "$VIBEYEAH_CONFIG_BUNDLE_URL" ]; then
+    echo "[init-fetch] WARNING: bundle url is empty, skip"
+    exit 0
+fi
+TMP="$(mktemp -d)"
+trap 'rm -rf "$TMP"' EXIT
+if curl -fsSL --retry 3 --connect-timeout 10 --max-time 300 -o "$TMP/bundle.tar.gz" "$VIBEYEAH_CONFIG_BUNDLE_URL"; then
+    mkdir -p "{NAS_MOUNT_PATH}"
+    tar xzf "$TMP/bundle.tar.gz" -C "{NAS_MOUNT_PATH}" --skip-old-files || echo "[init-fetch] WARNING: tar exited $?"
+    mkdir -p "$AGENT_DIR"
+    touch "$MARKER"
+    echo "[init-fetch] applied config bundle"
+else
+    echo "[init-fetch] WARNING: failed to fetch config bundle, falling back to NAS/in-image configs"
+fi
+"#
+        );
+
+        init_containers.push(Container {
+            name: "init-fetch-configs".to_string(),
+            image: Some(desktop_image.to_string()),
+            command: Some(vec!["sh".to_string(), "-c".to_string(), fetch_script]),
+            env: Some(vec![EnvVar {
+                name: "VIBEYEAH_CONFIG_BUNDLE_URL".to_string(),
+                value: Some(bundle_url),
+                ..Default::default()
+            }]),
+            volume_mounts: Some(vec![VolumeMount {
+                name: "nas".to_string(),
+                mount_path: NAS_MOUNT_PATH.to_string(),
+                ..Default::default()
+            }]),
+            ..Default::default()
+        });
+    }
+    init_containers.push(init_configs);
+
     let deployment = Deployment {
         metadata: ObjectMeta {
             name: Some(name.clone()),
@@ -307,7 +363,7 @@ chown -R 1000:1000 "{NAS_MOUNT_PATH}/vibeyeah/agents/{name}"
                     ..Default::default()
                 }),
                 spec: Some(PodSpec {
-                    init_containers: Some(vec![init_configs]),
+                    init_containers: Some(init_containers),
                     // containers: vec![desktop, sidecar],
                     containers: vec![desktop],
                     // // emptyDir 共享 X11 socket
