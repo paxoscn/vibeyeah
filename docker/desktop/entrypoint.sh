@@ -84,13 +84,32 @@ start_user_gateway() {
     # 3) 以该用户身份启动独立 gateway（日志按用户分开）。
     #    用 setsid 让每个 gateway 运行在自己的会话/进程组中：否则 gateway 重启时
     #    向其进程组发出的清理信号会波及作为 PID 1 的 entrypoint，导致整个 pod 被重启。
-    echo "[desktop] starting hermes gateway for user ${user_id} (user=${linux_user}, HERMES_HOME=${hermes_home})..."
+    # 平台把微信/飞书凭据注入为**容器环境变量**（WEIXIN_*/LARK_*，模板里没有对应配置项）。
+    # 但 `env VAR=… cmd` 会用列出的变量替换掉整个环境，`sudo -u` 本身也会重置环境 ——
+    # 不显式透传的话 gateway 拿不到这些凭据，表现为「gateway 起来了但微信机器人暂无法连接」，
+    # 而手动执行 `hermes gateway` 又正常（交互 shell 继承了容器环境）。
+    local -a creds_env=()
+    local name
+    for name in WEIXIN_ACCOUNT_ID WEIXIN_TOKEN WEIXIN_BASE_URL WEIXIN_USER_ID \
+                LARK_APP_ID LARK_APP_SECRET LARK_OPEN_ID \
+                AGENT_NAME AGENT_CONFIG_DIR; do
+        [ -n "${!name:-}" ] && creds_env+=("${name}=${!name}")
+    done
+    if [ -z "${WEIXIN_ACCOUNT_ID:-}" ]; then
+        echo "[desktop] WARNING: 容器未注入 WEIXIN_ACCOUNT_ID，gateway 无法连接微信"
+    fi
+
+    echo "[desktop] starting hermes gateway for user ${user_id} (user=${linux_user}, HERMES_HOME=${hermes_home}, 透传凭据 ${#creds_env[@]} 项)..."
     setsid sudo -n -u "${linux_user}" -- env \
         HOME="${user_home}" \
         HERMES_HOME="${hermes_home}" \
         DISPLAY="${DISPLAY}" \
         PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin" \
+        "${creds_env[@]}" \
         "${HERMES_BIN}" gateway >> "/tmp/hermes-gateway-${user_id}.log" 2>&1 &
+
+    chmod a+w "/tmp/hermes-gateway-${user_id}.log"
+
     return 0
 }
 

@@ -1,0 +1,154 @@
+{
+  "per_unit": {
+    "service/lark_bot": {
+      "loc": 1276,
+      "files": 1,
+      "panics": 2,
+      "tests": 2,
+      "unsafe": 0,
+      "observability_calls": 23,
+      "role": "Lark (Feishu) bot: event handling, message routing, agent replies"
+    },
+    "service/k8s": {
+      "loc": 716,
+      "files": 1,
+      "panics": 0,
+      "tests": 0,
+      "unsafe": 0,
+      "observability_calls": 8,
+      "role": "Kubernetes resource management: pods, deployments, kubeconfig, secrets"
+    },
+    "service/user_home": {
+      "loc": 430,
+      "files": 1,
+      "panics": 0,
+      "tests": 4,
+      "unsafe": 0,
+      "observability_calls": 5,
+      "role": "User home-directory provisioning and filesystem bootstrap"
+    },
+    "service/callback": {
+      "loc": 373,
+      "files": 1,
+      "panics": 0,
+      "tests": 3,
+      "unsafe": 0,
+      "observability_calls": 6,
+      "role": "Lark callback endpoints: event verification and dispatch"
+    },
+    "service/lark_qr": {
+      "loc": 350,
+      "files": 1,
+      "panics": 0,
+      "tests": 0,
+      "unsafe": 0,
+      "observability_calls": 7,
+      "role": "Lark QR-code login flow"
+    },
+    "service/agent": {
+      "loc": 285,
+      "files": 1,
+      "panics": 0,
+      "tests": 0,
+      "unsafe": 0,
+      "observability_calls": 4,
+      "role": "Agent lifecycle: create, start, stop, status"
+    },
+    "service/auth": {
+      "loc": 237,
+      "files": 1,
+      "panics": 1,
+      "tests": 0,
+      "unsafe": 0,
+      "observability_calls": 3,
+      "role": "Authentication and session/credential handling"
+    },
+    "service/sync": {
+      "loc": 247,
+      "files": 1,
+      "panics": 0,
+      "tests": 0,
+      "unsafe": 0,
+      "observability_calls": 4,
+      "role": "Data synchronisation with upstream directory sources"
+    },
+    "service/organization": {
+      "loc": 227,
+      "files": 1,
+      "panics": 4,
+      "tests": 0,
+      "unsafe": 0,
+      "observability_calls": 1,
+      "role": "Organisation management and ownership"
+    },
+    "service/wechat_qr": {
+      "loc": 109,
+      "files": 1,
+      "panics": 4,
+      "tests": 0,
+      "unsafe": 0,
+      "observability_calls": 0,
+      "role": "WeChat QR-code login flow"
+    },
+    "api": {
+      "loc": 672,
+      "files": 8,
+      "panics": 0,
+      "tests": 0,
+      "unsafe": 0,
+      "observability_calls": 8,
+      "role": "HTTP API handlers: routing, request parsing, response shaping"
+    },
+    "data_layer": {
+      "loc": 2044,
+      "files": 29,
+      "panics": 0,
+      "tests": 0,
+      "unsafe": 0,
+      "observability_calls": 0,
+      "role": "Database entities and schema migrations (migrations sampled)"
+    },
+    "config_middleware": {
+      "loc": 170,
+      "files": 3,
+      "panics": 0,
+      "tests": 0,
+      "unsafe": 0,
+      "observability_calls": 1,
+      "role": "Configuration loading and HTTP middleware (auth layer)"
+    },
+    "app_entry": {
+      "loc": 643,
+      "files": 2,
+      "panics": 3,
+      "tests": 6,
+      "unsafe": 0,
+      "observability_calls": 15,
+      "role": "Application entrypoint, router wiring, background schedulers"
+    }
+  },
+  "totals": {
+    "loc": 7779,
+    "files": 52,
+    "panics": 14,
+    "tests": 15,
+    "unsafe": 0,
+    "units": 14,
+    "units_with_no_tests": 10,
+    "untested_units": [
+      "service/k8s",
+      "service/lark_qr",
+      "service/agent",
+      "service/auth",
+      "service/sync",
+      "service/organization",
+      "service/wechat_qr",
+      "api",
+      "data_layer",
+      "config_middleware"
+    ],
+    "panic_sites_per_kloc": 1.8,
+    "tests_per_kloc": 1.9,
+    "ci": "cargo fmt --check, cargo clippy (advisory, not -D warnings), cargo build --locked, cargo test --locked"
+  }
+}

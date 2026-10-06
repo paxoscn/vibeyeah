@@ -1,0 +1,378 @@
+{
+  "overall": 0.5500507936507937,
+  "weights": {
+    "security": 0.2,
+    "error_handling": 0.15,
+    "test_coverage": 0.15,
+    "modularity": 0.12,
+    "infrastructure": 0.1,
+    "readability": 0.1,
+    "testability": 0.1,
+    "documentation": 0.08
+  },
+  "dimensions": {
+    "error_handling": {
+      "plain": 0.6854761904761906,
+      "loc_weighted": 0.6849109044105582,
+      "mean_confidence": 0.5692857142857143,
+      "unreviewed": [
+        "service/callback",
+        "service/auth",
+        "data_layer"
+      ]
+    },
+    "readability": {
+      "plain": 0.8652380952380953,
+      "loc_weighted": 0.8748056110480907,
+      "mean_confidence": 0.7478571428571428,
+      "unreviewed": []
+    },
+    "modularity": {
+      "plain": 0.4828571428571428,
+      "loc_weighted": 0.49160935749418144,
+      "mean_confidence": 0.5835714285714285,
+      "unreviewed": []
+    },
+    "security": {
+      "plain": 0.3030952380952381,
+      "loc_weighted": 0.29962350257765297,
+      "mean_confidence": 0.5750000000000001,
+      "unreviewed": [
+        "service/k8s",
+        "service/user_home"
+      ]
+    },
+    "testability": {
+      "plain": 0.5614285714285715,
+      "loc_weighted": 0.5652257824933111,
+      "mean_confidence": 0.6692857142857143,
+      "unreviewed": [
+        "service/lark_qr",
+        "data_layer"
+      ]
+    },
+    "documentation": {
+      "plain": 0.8616666666666667,
+      "mean_confidence": 0.75,
+      "unreviewed": []
+    },
+    "infrastructure": {
+      "plain": 0.3688888888888889,
+      "mean_confidence": 0.7566666666666665,
+      "unreviewed": []
+    },
+    "test_coverage": {
+      "plain": 0.5345238095238096,
+      "mean_confidence": 0.455,
+      "unreviewed": [],
+      "detail": {
+        "units_with_tests": 4,
+        "units_total": 14,
+        "tests_per_kloc": 1.9
+      }
+    }
+  },
+  "unit_scores": {
+    "error_handling": {
+      "service/lark_bot": 0.52,
+      "service/k8s": 0.6133333333333334,
+      "service/user_home": 0.8533333333333334,
+      "service/callback": 0.6633333333333333,
+      "service/lark_qr": 0.7566666666666667,
+      "service/agent": 0.84,
+      "service/auth": 0.5,
+      "service/sync": 0.71,
+      "service/organization": 0.6766666666666666,
+      "service/wechat_qr": 0.6566666666666666,
+      "api": 0.6766666666666666,
+      "data_layer": 0.8233333333333334,
+      "config_middleware": 0.75,
+      "app_entry": 0.5566666666666666
+    },
+    "readability": {
+      "service/lark_bot": 0.7866666666666666,
+      "service/k8s": 0.88,
+      "service/user_home": 0.9833333333333334,
+      "service/callback": 0.9866666666666667,
+      "service/lark_qr": 0.8833333333333333,
+      "service/agent": 0.7933333333333333,
+      "service/auth": 0.7599999999999999,
+      "service/sync": 0.9066666666666667,
+      "service/organization": 0.94,
+      "service/wechat_qr": 0.6633333333333333,
+      "api": 0.87,
+      "data_layer": 0.9033333333333333,
+      "config_middleware": 0.7966666666666667,
+      "app_entry": 0.96
+    },
+    "modularity": {
+      "service/lark_bot": 0.19666666666666666,
+      "service/k8s": 0.3833333333333333,
+      "service/user_home": 0.7466666666666667,
+      "service/callback": 0.47,
+      "service/lark_qr": 0.6166666666666667,
+      "service/agent": 0.24666666666666667,
+      "service/auth": 0.15666666666666665,
+      "service/sync": 0.38999999999999996,
+      "service/organization": 0.5833333333333334,
+      "service/wechat_qr": 0.5866666666666667,
+      "api": 0.6166666666666667,
+      "data_layer": 0.7733333333333333,
+      "config_middleware": 0.6133333333333334,
+      "app_entry": 0.37999999999999995
+    },
+    "security": {
+      "service/lark_bot": 0.31666666666666665,
+      "service/k8s": 0.17666666666666667,
+      "service/user_home": 0.20333333333333334,
+      "service/callback": 0.19666666666666666,
+      "service/lark_qr": 0.36333333333333334,
+      "service/agent": 0.45333333333333337,
+      "service/auth": 0.33,
+      "service/sync": 0.13999999999999999,
+      "service/organization": 0.13333333333333333,
+      "service/wechat_qr": 0.22333333333333336,
+      "api": 0.45999999999999996,
+      "data_layer": 0.22999999999999998,
+      "config_middleware": 0.5733333333333334,
+      "app_entry": 0.44333333333333336
+    },
+    "testability": {
+      "service/lark_bot": 0.3666666666666667,
+      "service/k8s": 0.45999999999999996,
+      "service/user_home": 0.63,
+      "service/callback": 0.6566666666666666,
+      "service/lark_qr": 0.5033333333333333,
+      "service/agent": 0.45333333333333337,
+      "service/auth": 0.5599999999999999,
+      "service/sync": 0.5533333333333333,
+      "service/organization": 0.54,
+      "service/wechat_qr": 0.5533333333333333,
+      "api": 0.61,
+      "data_layer": 0.7333333333333334,
+      "config_middleware": 0.64,
+      "app_entry": 0.6
+    }
+  },
+  "unit_confidence": {
+    "error_handling": {
+      "service/lark_bot": 0.55,
+      "service/k8s": 0.62,
+      "service/user_home": 0.56,
+      "service/callback": 0.49,
+      "service/lark_qr": 0.54,
+      "service/agent": 0.52,
+      "service/auth": 0.47,
+      "service/sync": 0.61,
+      "service/organization": 0.67,
+      "service/wechat_qr": 0.62,
+      "api": 0.63,
+      "data_layer": 0.47,
+      "config_middleware": 0.56,
+      "app_entry": 0.66
+    },
+    "readability": {
+      "service/lark_bot": 0.62,
+      "service/k8s": 0.64,
+      "service/user_home": 0.95,
+      "service/callback": 0.96,
+      "service/lark_qr": 0.65,
+      "service/agent": 0.6,
+      "service/auth": 0.72,
+      "service/sync": 0.72,
+      "service/organization": 0.82,
+      "service/wechat_qr": 0.99,
+      "api": 0.61,
+      "data_layer": 0.71,
+      "config_middleware": 0.6,
+      "app_entry": 0.88
+    },
+    "modularity": {
+      "service/lark_bot": 0.57,
+      "service/k8s": 0.68,
+      "service/user_home": 0.58,
+      "service/callback": 0.51,
+      "service/lark_qr": 0.65,
+      "service/agent": 0.5,
+      "service/auth": 0.53,
+      "service/sync": 0.6,
+      "service/organization": 0.56,
+      "service/wechat_qr": 0.58,
+      "api": 0.67,
+      "data_layer": 0.52,
+      "config_middleware": 0.62,
+      "app_entry": 0.6
+    },
+    "security": {
+      "service/lark_bot": 0.74,
+      "service/k8s": 0.47,
+      "service/user_home": 0.39,
+      "service/callback": 0.5,
+      "service/lark_qr": 0.5,
+      "service/agent": 0.62,
+      "service/auth": 0.76,
+      "service/sync": 0.58,
+      "service/organization": 0.6,
+      "service/wechat_qr": 0.55,
+      "api": 0.56,
+      "data_layer": 0.56,
+      "config_middleware": 0.62,
+      "app_entry": 0.6
+    },
+    "testability": {
+      "service/lark_bot": 0.84,
+      "service/k8s": 0.58,
+      "service/user_home": 0.79,
+      "service/callback": 0.84,
+      "service/lark_qr": 0.49,
+      "service/agent": 0.62,
+      "service/auth": 0.67,
+      "service/sync": 0.61,
+      "service/organization": 0.58,
+      "service/wechat_qr": 0.65,
+      "api": 0.66,
+      "data_layer": 0.45,
+      "config_middleware": 0.85,
+      "app_entry": 0.74
+    }
+  },
+  "gates": [
+    {
+      "id": "SEC-1",
+      "condition": "No request-controlled value reaches a shell",
+      "status": "FAIL",
+      "evidence": "api/sync.rs takes `paths` and `commit_message` from the request body of any authenticated org member and passes them to service/sync.rs::build_sync_script, which interpolates them into a single-line shell script run via `sh -c` in the pod (k8s.rs::exec_in_pod). `for SRC in {path_list}` is unquoted, and `git commit -m '{commit_message}'` breaks out with a single quote. An org member can therefore run arbitrary commands in the pod, and can read the org's git credentials, which git_sync_org_agents decrypts from the organization record and injects into that same container."
+    },
+    {
+      "id": "TEST-1",
+      "condition": "Privileged paths have at least one test",
+      "status": "FAIL",
+      "evidence": "10 of 14 modules have no test module at all, including every auth, k8s and API handler module: service/k8s, service/lark_qr, service/agent, service/auth, service/sync, service/organization, service/wechat_qr, api, data_layer, config_middleware."
+    },
+    {
+      "id": "DEP-1",
+      "condition": "The build is pinned end to end",
+      "status": "FAIL",
+      "evidence": "Cargo.lock is committed and CI builds with --locked, but container base images float (ubuntu:22.04 by tag, and Dockerfile-next1/2 depend on desktop:20260608 / desktop:20260612 by tag) and the Rust toolchain is `stable` in CI rather than pinned."
+    }
+  ],
+  "corrections": [
+    {
+      "id": "data_layer.hardcoded_secret",
+      "raw": 0.7,
+      "corrected": 0.02,
+      "why": "Flagged on the identifiers `lark_app_secret` / `image_pull_secret`, which are database column names, not credentials. Verified by reading entity/organization.rs and entity/agent.rs: no literal secret is present."
+    },
+    {
+      "id": "infrastructure.secret_hygiene",
+      "raw": 0.09999999999999999,
+      "corrected": 0.3333333333333333,
+      "why": "Placed on the worst level because deploy/test/init.sql contains the literal `REPLACE_WITH_YOUR_LARK_APP_SECRET` and deployment.yaml carries `postgres:postgres`. Both are placeholders in a *test* manifest, and init.sql explicitly warns against committing real credentials, so 'secrets are written into committed files' is not literally true. Level 1 is fair: configs/.hermes/.env is force-un-ignored in .gitignore, which invites a real key to be committed later."
+    }
+  ],
+  "nouls": {
+    "service/lark_bot": {
+      "hardcoded_secret": 0.07,
+      "unvalidated_input_to_sink": 0.42,
+      "blocking_call_in_async": 0.3
+    },
+    "service/k8s": {
+      "hardcoded_secret": 0.06,
+      "unvalidated_input_to_sink": 0.84,
+      "blocking_call_in_async": 0.55
+    },
+    "service/user_home": {
+      "hardcoded_secret": 0.36,
+      "unvalidated_input_to_sink": 0.57,
+      "blocking_call_in_async": 0.12
+    },
+    "service/callback": {
+      "hardcoded_secret": 0.03,
+      "unvalidated_input_to_sink": 0.46,
+      "blocking_call_in_async": 0.36
+    },
+    "service/lark_qr": {
+      "hardcoded_secret": 0.05,
+      "unvalidated_input_to_sink": 0.41,
+      "blocking_call_in_async": 0.28
+    },
+    "service/agent": {
+      "hardcoded_secret": 0.04,
+      "unvalidated_input_to_sink": 0.51,
+      "blocking_call_in_async": 0.14
+    },
+    "service/auth": {
+      "hardcoded_secret": 0.05,
+      "unvalidated_input_to_sink": 0.21,
+      "blocking_call_in_async": 0.21
+    },
+    "service/sync": {
+      "hardcoded_secret": 0.09,
+      "unvalidated_input_to_sink": 0.92,
+      "blocking_call_in_async": 0.34
+    },
+    "service/organization": {
+      "hardcoded_secret": 0.12,
+      "unvalidated_input_to_sink": 0.27,
+      "blocking_call_in_async": 0.09
+    },
+    "service/wechat_qr": {
+      "hardcoded_secret": 0.11,
+      "unvalidated_input_to_sink": 0.79,
+      "blocking_call_in_async": 0.09
+    },
+    "api": {
+      "hardcoded_secret": 0.1,
+      "unvalidated_input_to_sink": 0.37,
+      "blocking_call_in_async": 0.14
+    },
+    "data_layer": {
+      "hardcoded_secret": 0.7,
+      "unvalidated_input_to_sink": 0.53,
+      "blocking_call_in_async": 0.15
+    },
+    "config_middleware": {
+      "hardcoded_secret": 0.06,
+      "unvalidated_input_to_sink": 0.36,
+      "blocking_call_in_async": 0.13
+    },
+    "app_entry": {
+      "hardcoded_secret": 0.09,
+      "unvalidated_input_to_sink": 0.42,
+      "blocking_call_in_async": 0.21
+    }
+  },
+  "metrics": {
+    "loc": 7779,
+    "files": 52,
+    "panics": 14,
+    "tests": 15,
+    "unsafe": 0,
+    "units": 14,
+    "units_with_no_tests": 10,
+    "untested_units": [
+      "service/k8s",
+      "service/lark_qr",
+      "service/agent",
+      "service/auth",
+      "service/sync",
+      "service/organization",
+      "service/wechat_qr",
+      "api",
+      "data_layer",
+      "config_middleware"
+    ],
+    "panic_sites_per_kloc": 1.8,
+    "tests_per_kloc": 1.9,
+    "ci": "cargo fmt --check, cargo clippy (advisory, not -D warnings), cargo build --locked, cargo test --locked"
+  },
+  "token_usage": {
+    "input": 122471,
+    "output": 2060
+  },
+  "sensitivity": {
+    "equal weights": 0.5828968253968254,
+    "security-heavy": 0.5088915343915345,
+    "flip security/readability": 0.6062650793650795
+  }
+}

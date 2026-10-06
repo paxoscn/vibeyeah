@@ -1,0 +1,3027 @@
+{
+  "model": "jev-latest",
+  "units": {
+    "service/lark_bot": {
+      "role": "Lark (Feishu) bot: event handling, message routing, agent replies",
+      "files": [
+        {
+          "path": "backend/src/service/lark_bot.rs",
+          "lines": 1276,
+          "truncated": true
+        }
+      ],
+      "questions": {
+        "error_handling": {
+          "type": "score",
+          "instructions": "How well does this code handle failure and error conditions? Consider how fallible operations (I/O, network, database, external APIs) are treated and what happens to the caller when they fail.",
+          "criteria": [
+            "Failure paths are unhandled: unchecked unwrap/expect, panics, or silently discarded errors on operations that can fail in normal operation",
+            "Errors are surfaced but inconsistently: some paths return errors while others panic or swallow them, with no clear rule for which",
+            "Most fallible paths return or propagate errors; a few unchecked spots remain, mostly in startup or genuinely-impossible branches",
+            "Errors are consistently propagated with context, callers can distinguish failure modes, and no reachable panic remains on ordinary error paths"
+          ]
+        },
+        "readability": {
+          "type": "score",
+          "instructions": "How readable and well-organised is this code for a maintainer who is new to this file? Consider naming, function size and structure, nesting depth, and whether comments explain intent.",
+          "criteria": [
+            "Hard to follow: unclear or misleading names, deep nesting, long unstructured blocks where the flow cannot be traced",
+            "Understandable but uneven: naming and structure vary within the file, and a reader must re-read sections to follow the control flow",
+            "Clear names and structure throughout; a new maintainer can follow most flows on a first read without external help",
+            "Consistently clear: intention-revealing names, well-factored flows, and comments that explain why the code is this way rather than restating what it does"
+          ]
+        },
+        "modularity": {
+          "type": "score",
+          "instructions": "How well does this code separate concerns and limit coupling? Consider whether unrelated responsibilities sit together, whether callers reach into internals, and how far a change ripples.",
+          "criteria": [
+            "Concerns are entangled: unrelated responsibilities such as transport, business rules, persistence and I/O are mixed together in the same functions",
+            "Some separation exists, but responsibilities leak across boundaries and callers depend on implementation details rather than a defined interface",
+            "Clear responsibilities with defined interfaces; a change to one concern stays mostly local to this unit",
+            "Well-bounded units with narrow interfaces; dependencies point in one direction and units can be understood, replaced or tested independently"
+          ]
+        },
+        "security": {
+          "type": "score",
+          "instructions": "How well does this code guard against security and authorisation failures? Consider trust in external input, authorisation at privileged boundaries, credential handling, and whether secrets can leak into logs or errors.",
+          "criteria": [
+            "Trusts input or callers without checks, or handles credentials unsafely; privileged operations are reachable without an authorisation decision",
+            "Partial validation or authentication, but with real gaps: some privileged paths lack an authorisation check, or unsafe defaults are used",
+            "Input is validated and authorisation enforced on the main paths; only minor hardening gaps remain",
+            "Consistent input validation, an explicit authorisation decision at every privileged boundary, and secrets kept out of code, logs and error messages"
+          ]
+        },
+        "testability": {
+          "type": "score",
+          "instructions": "How easily could this code be verified by automated tests? Consider whether logic is separated from side effects, whether state is passed in or hidden in globals, and whether there are seams to substitute collaborators.",
+          "criteria": [
+            "Untestable as written: business logic is welded to I/O, globals and hard-coded externals with no seam to substitute",
+            "Testable only with heavy setup: logic and side effects are entangled, so exercising one path requires standing up most of the surrounding system",
+            "Core logic can be exercised with modest setup; some I/O still needs stubbing or a real dependency to be present",
+            "Logic is separated from effects behind clear seams, so behaviour can be exercised directly and deterministically"
+          ]
+        },
+        "hardcoded_secret": {
+          "type": "noul",
+          "instructions": "This code contains a hard-coded credential, API key, token or password that is written into the source rather than read from configuration or the environment."
+        },
+        "unvalidated_input_to_sink": {
+          "type": "noul",
+          "instructions": "User-controlled or externally-supplied input reaches a dangerous sink (a shell command, a filesystem path, a raw query, or an outbound request URL) without validation or escaping."
+        },
+        "blocking_call_in_async": {
+          "type": "noul",
+          "instructions": "This code performs a blocking, synchronous operation (blocking filesystem, blocking network, thread sleep or CPU-heavy work) inside an async function without offloading it to a blocking thread pool."
+        }
+      }
+    },
+    "service/k8s": {
+      "role": "Kubernetes resource management: pods, deployments, kubeconfig, secrets",
+      "files": [
+        {
+          "path": "backend/src/service/k8s.rs",
+          "lines": 716,
+          "truncated": false
+        }
+      ],
+      "questions": {
+        "error_handling": {
+          "type": "score",
+          "instructions": "How well does this code handle failure and error conditions? Consider how fallible operations (I/O, network, database, external APIs) are treated and what happens to the caller when they fail.",
+          "criteria": [
+            "Failure paths are unhandled: unchecked unwrap/expect, panics, or silently discarded errors on operations that can fail in normal operation",
+            "Errors are surfaced but inconsistently: some paths return errors while others panic or swallow them, with no clear rule for which",
+            "Most fallible paths return or propagate errors; a few unchecked spots remain, mostly in startup or genuinely-impossible branches",
+            "Errors are consistently propagated with context, callers can distinguish failure modes, and no reachable panic remains on ordinary error paths"
+          ]
+        },
+        "readability": {
+          "type": "score",
+          "instructions": "How readable and well-organised is this code for a maintainer who is new to this file? Consider naming, function size and structure, nesting depth, and whether comments explain intent.",
+          "criteria": [
+            "Hard to follow: unclear or misleading names, deep nesting, long unstructured blocks where the flow cannot be traced",
+            "Understandable but uneven: naming and structure vary within the file, and a reader must re-read sections to follow the control flow",
+            "Clear names and structure throughout; a new maintainer can follow most flows on a first read without external help",
+            "Consistently clear: intention-revealing names, well-factored flows, and comments that explain why the code is this way rather than restating what it does"
+          ]
+        },
+        "modularity": {
+          "type": "score",
+          "instructions": "How well does this code separate concerns and limit coupling? Consider whether unrelated responsibilities sit together, whether callers reach into internals, and how far a change ripples.",
+          "criteria": [
+            "Concerns are entangled: unrelated responsibilities such as transport, business rules, persistence and I/O are mixed together in the same functions",
+            "Some separation exists, but responsibilities leak across boundaries and callers depend on implementation details rather than a defined interface",
+            "Clear responsibilities with defined interfaces; a change to one concern stays mostly local to this unit",
+            "Well-bounded units with narrow interfaces; dependencies point in one direction and units can be understood, replaced or tested independently"
+          ]
+        },
+        "security": {
+          "type": "score",
+          "instructions": "How well does this code guard against security and authorisation failures? Consider trust in external input, authorisation at privileged boundaries, credential handling, and whether secrets can leak into logs or errors.",
+          "criteria": [
+            "Trusts input or callers without checks, or handles credentials unsafely; privileged operations are reachable without an authorisation decision",
+            "Partial validation or authentication, but with real gaps: some privileged paths lack an authorisation check, or unsafe defaults are used",
+            "Input is validated and authorisation enforced on the main paths; only minor hardening gaps remain",
+            "Consistent input validation, an explicit authorisation decision at every privileged boundary, and secrets kept out of code, logs and error messages"
+          ]
+        },
+        "testability": {
+          "type": "score",
+          "instructions": "How easily could this code be verified by automated tests? Consider whether logic is separated from side effects, whether state is passed in or hidden in globals, and whether there are seams to substitute collaborators.",
+          "criteria": [
+            "Untestable as written: business logic is welded to I/O, globals and hard-coded externals with no seam to substitute",
+            "Testable only with heavy setup: logic and side effects are entangled, so exercising one path requires standing up most of the surrounding system",
+            "Core logic can be exercised with modest setup; some I/O still needs stubbing or a real dependency to be present",
+            "Logic is separated from effects behind clear seams, so behaviour can be exercised directly and deterministically"
+          ]
+        },
+        "hardcoded_secret": {
+          "type": "noul",
+          "instructions": "This code contains a hard-coded credential, API key, token or password that is written into the source rather than read from configuration or the environment."
+        },
+        "unvalidated_input_to_sink": {
+          "type": "noul",
+          "instructions": "User-controlled or externally-supplied input reaches a dangerous sink (a shell command, a filesystem path, a raw query, or an outbound request URL) without validation or escaping."
+        },
+        "blocking_call_in_async": {
+          "type": "noul",
+          "instructions": "This code performs a blocking, synchronous operation (blocking filesystem, blocking network, thread sleep or CPU-heavy work) inside an async function without offloading it to a blocking thread pool."
+        }
+      }
+    },
+    "service/user_home": {
+      "role": "User home-directory provisioning and filesystem bootstrap",
+      "files": [
+        {
+          "path": "backend/src/service/user_home.rs",
+          "lines": 430,
+          "truncated": false
+        }
+      ],
+      "questions": {
+        "error_handling": {
+          "type": "score",
+          "instructions": "How well does this code handle failure and error conditions? Consider how fallible operations (I/O, network, database, external APIs) are treated and what happens to the caller when they fail.",
+          "criteria": [
+            "Failure paths are unhandled: unchecked unwrap/expect, panics, or silently discarded errors on operations that can fail in normal operation",
+            "Errors are surfaced but inconsistently: some paths return errors while others panic or swallow them, with no clear rule for which",
+            "Most fallible paths return or propagate errors; a few unchecked spots remain, mostly in startup or genuinely-impossible branches",
+            "Errors are consistently propagated with context, callers can distinguish failure modes, and no reachable panic remains on ordinary error paths"
+          ]
+        },
+        "readability": {
+          "type": "score",
+          "instructions": "How readable and well-organised is this code for a maintainer who is new to this file? Consider naming, function size and structure, nesting depth, and whether comments explain intent.",
+          "criteria": [
+            "Hard to follow: unclear or misleading names, deep nesting, long unstructured blocks where the flow cannot be traced",
+            "Understandable but uneven: naming and structure vary within the file, and a reader must re-read sections to follow the control flow",
+            "Clear names and structure throughout; a new maintainer can follow most flows on a first read without external help",
+            "Consistently clear: intention-revealing names, well-factored flows, and comments that explain why the code is this way rather than restating what it does"
+          ]
+        },
+        "modularity": {
+          "type": "score",
+          "instructions": "How well does this code separate concerns and limit coupling? Consider whether unrelated responsibilities sit together, whether callers reach into internals, and how far a change ripples.",
+          "criteria": [
+            "Concerns are entangled: unrelated responsibilities such as transport, business rules, persistence and I/O are mixed together in the same functions",
+            "Some separation exists, but responsibilities leak across boundaries and callers depend on implementation details rather than a defined interface",
+            "Clear responsibilities with defined interfaces; a change to one concern stays mostly local to this unit",
+            "Well-bounded units with narrow interfaces; dependencies point in one direction and units can be understood, replaced or tested independently"
+          ]
+        },
+        "security": {
+          "type": "score",
+          "instructions": "How well does this code guard against security and authorisation failures? Consider trust in external input, authorisation at privileged boundaries, credential handling, and whether secrets can leak into logs or errors.",
+          "criteria": [
+            "Trusts input or callers without checks, or handles credentials unsafely; privileged operations are reachable without an authorisation decision",
+            "Partial validation or authentication, but with real gaps: some privileged paths lack an authorisation check, or unsafe defaults are used",
+            "Input is validated and authorisation enforced on the main paths; only minor hardening gaps remain",
+            "Consistent input validation, an explicit authorisation decision at every privileged boundary, and secrets kept out of code, logs and error messages"
+          ]
+        },
+        "testability": {
+          "type": "score",
+          "instructions": "How easily could this code be verified by automated tests? Consider whether logic is separated from side effects, whether state is passed in or hidden in globals, and whether there are seams to substitute collaborators.",
+          "criteria": [
+            "Untestable as written: business logic is welded to I/O, globals and hard-coded externals with no seam to substitute",
+            "Testable only with heavy setup: logic and side effects are entangled, so exercising one path requires standing up most of the surrounding system",
+            "Core logic can be exercised with modest setup; some I/O still needs stubbing or a real dependency to be present",
+            "Logic is separated from effects behind clear seams, so behaviour can be exercised directly and deterministically"
+          ]
+        },
+        "hardcoded_secret": {
+          "type": "noul",
+          "instructions": "This code contains a hard-coded credential, API key, token or password that is written into the source rather than read from configuration or the environment."
+        },
+        "unvalidated_input_to_sink": {
+          "type": "noul",
+          "instructions": "User-controlled or externally-supplied input reaches a dangerous sink (a shell command, a filesystem path, a raw query, or an outbound request URL) without validation or escaping."
+        },
+        "blocking_call_in_async": {
+          "type": "noul",
+          "instructions": "This code performs a blocking, synchronous operation (blocking filesystem, blocking network, thread sleep or CPU-heavy work) inside an async function without offloading it to a blocking thread pool."
+        }
+      }
+    },
+    "service/callback": {
+      "role": "Lark callback endpoints: event verification and dispatch",
+      "files": [
+        {
+          "path": "backend/src/service/callback.rs",
+          "lines": 373,
+          "truncated": false
+        }
+      ],
+      "questions": {
+        "error_handling": {
+          "type": "score",
+          "instructions": "How well does this code handle failure and error conditions? Consider how fallible operations (I/O, network, database, external APIs) are treated and what happens to the caller when they fail.",
+          "criteria": [
+            "Failure paths are unhandled: unchecked unwrap/expect, panics, or silently discarded errors on operations that can fail in normal operation",
+            "Errors are surfaced but inconsistently: some paths return errors while others panic or swallow them, with no clear rule for which",
+            "Most fallible paths return or propagate errors; a few unchecked spots remain, mostly in startup or genuinely-impossible branches",
+            "Errors are consistently propagated with context, callers can distinguish failure modes, and no reachable panic remains on ordinary error paths"
+          ]
+        },
+        "readability": {
+          "type": "score",
+          "instructions": "How readable and well-organised is this code for a maintainer who is new to this file? Consider naming, function size and structure, nesting depth, and whether comments explain intent.",
+          "criteria": [
+            "Hard to follow: unclear or misleading names, deep nesting, long unstructured blocks where the flow cannot be traced",
+            "Understandable but uneven: naming and structure vary within the file, and a reader must re-read sections to follow the control flow",
+            "Clear names and structure throughout; a new maintainer can follow most flows on a first read without external help",
+            "Consistently clear: intention-revealing names, well-factored flows, and comments that explain why the code is this way rather than restating what it does"
+          ]
+        },
+        "modularity": {
+          "type": "score",
+          "instructions": "How well does this code separate concerns and limit coupling? Consider whether unrelated responsibilities sit together, whether callers reach into internals, and how far a change ripples.",
+          "criteria": [
+            "Concerns are entangled: unrelated responsibilities such as transport, business rules, persistence and I/O are mixed together in the same functions",
+            "Some separation exists, but responsibilities leak across boundaries and callers depend on implementation details rather than a defined interface",
+            "Clear responsibilities with defined interfaces; a change to one concern stays mostly local to this unit",
+            "Well-bounded units with narrow interfaces; dependencies point in one direction and units can be understood, replaced or tested independently"
+          ]
+        },
+        "security": {
+          "type": "score",
+          "instructions": "How well does this code guard against security and authorisation failures? Consider trust in external input, authorisation at privileged boundaries, credential handling, and whether secrets can leak into logs or errors.",
+          "criteria": [
+            "Trusts input or callers without checks, or handles credentials unsafely; privileged operations are reachable without an authorisation decision",
+            "Partial validation or authentication, but with real gaps: some privileged paths lack an authorisation check, or unsafe defaults are used",
+            "Input is validated and authorisation enforced on the main paths; only minor hardening gaps remain",
+            "Consistent input validation, an explicit authorisation decision at every privileged boundary, and secrets kept out of code, logs and error messages"
+          ]
+        },
+        "testability": {
+          "type": "score",
+          "instructions": "How easily could this code be verified by automated tests? Consider whether logic is separated from side effects, whether state is passed in or hidden in globals, and whether there are seams to substitute collaborators.",
+          "criteria": [
+            "Untestable as written: business logic is welded to I/O, globals and hard-coded externals with no seam to substitute",
+            "Testable only with heavy setup: logic and side effects are entangled, so exercising one path requires standing up most of the surrounding system",
+            "Core logic can be exercised with modest setup; some I/O still needs stubbing or a real dependency to be present",
+            "Logic is separated from effects behind clear seams, so behaviour can be exercised directly and deterministically"
+          ]
+        },
+        "hardcoded_secret": {
+          "type": "noul",
+          "instructions": "This code contains a hard-coded credential, API key, token or password that is written into the source rather than read from configuration or the environment."
+        },
+        "unvalidated_input_to_sink": {
+          "type": "noul",
+          "instructions": "User-controlled or externally-supplied input reaches a dangerous sink (a shell command, a filesystem path, a raw query, or an outbound request URL) without validation or escaping."
+        },
+        "blocking_call_in_async": {
+          "type": "noul",
+          "instructions": "This code performs a blocking, synchronous operation (blocking filesystem, blocking network, thread sleep or CPU-heavy work) inside an async function without offloading it to a blocking thread pool."
+        }
+      }
+    },
+    "service/lark_qr": {
+      "role": "Lark QR-code login flow",
+      "files": [
+        {
+          "path": "backend/src/service/lark_qr.rs",
+          "lines": 350,
+          "truncated": false
+        }
+      ],
+      "questions": {
+        "error_handling": {
+          "type": "score",
+          "instructions": "How well does this code handle failure and error conditions? Consider how fallible operations (I/O, network, database, external APIs) are treated and what happens to the caller when they fail.",
+          "criteria": [
+            "Failure paths are unhandled: unchecked unwrap/expect, panics, or silently discarded errors on operations that can fail in normal operation",
+            "Errors are surfaced but inconsistently: some paths return errors while others panic or swallow them, with no clear rule for which",
+            "Most fallible paths return or propagate errors; a few unchecked spots remain, mostly in startup or genuinely-impossible branches",
+            "Errors are consistently propagated with context, callers can distinguish failure modes, and no reachable panic remains on ordinary error paths"
+          ]
+        },
+        "readability": {
+          "type": "score",
+          "instructions": "How readable and well-organised is this code for a maintainer who is new to this file? Consider naming, function size and structure, nesting depth, and whether comments explain intent.",
+          "criteria": [
+            "Hard to follow: unclear or misleading names, deep nesting, long unstructured blocks where the flow cannot be traced",
+            "Understandable but uneven: naming and structure vary within the file, and a reader must re-read sections to follow the control flow",
+            "Clear names and structure throughout; a new maintainer can follow most flows on a first read without external help",
+            "Consistently clear: intention-revealing names, well-factored flows, and comments that explain why the code is this way rather than restating what it does"
+          ]
+        },
+        "modularity": {
+          "type": "score",
+          "instructions": "How well does this code separate concerns and limit coupling? Consider whether unrelated responsibilities sit together, whether callers reach into internals, and how far a change ripples.",
+          "criteria": [
+            "Concerns are entangled: unrelated responsibilities such as transport, business rules, persistence and I/O are mixed together in the same functions",
+            "Some separation exists, but responsibilities leak across boundaries and callers depend on implementation details rather than a defined interface",
+            "Clear responsibilities with defined interfaces; a change to one concern stays mostly local to this unit",
+            "Well-bounded units with narrow interfaces; dependencies point in one direction and units can be understood, replaced or tested independently"
+          ]
+        },
+        "security": {
+          "type": "score",
+          "instructions": "How well does this code guard against security and authorisation failures? Consider trust in external input, authorisation at privileged boundaries, credential handling, and whether secrets can leak into logs or errors.",
+          "criteria": [
+            "Trusts input or callers without checks, or handles credentials unsafely; privileged operations are reachable without an authorisation decision",
+            "Partial validation or authentication, but with real gaps: some privileged paths lack an authorisation check, or unsafe defaults are used",
+            "Input is validated and authorisation enforced on the main paths; only minor hardening gaps remain",
+            "Consistent input validation, an explicit authorisation decision at every privileged boundary, and secrets kept out of code, logs and error messages"
+          ]
+        },
+        "testability": {
+          "type": "score",
+          "instructions": "How easily could this code be verified by automated tests? Consider whether logic is separated from side effects, whether state is passed in or hidden in globals, and whether there are seams to substitute collaborators.",
+          "criteria": [
+            "Untestable as written: business logic is welded to I/O, globals and hard-coded externals with no seam to substitute",
+            "Testable only with heavy setup: logic and side effects are entangled, so exercising one path requires standing up most of the surrounding system",
+            "Core logic can be exercised with modest setup; some I/O still needs stubbing or a real dependency to be present",
+            "Logic is separated from effects behind clear seams, so behaviour can be exercised directly and deterministically"
+          ]
+        },
+        "hardcoded_secret": {
+          "type": "noul",
+          "instructions": "This code contains a hard-coded credential, API key, token or password that is written into the source rather than read from configuration or the environment."
+        },
+        "unvalidated_input_to_sink": {
+          "type": "noul",
+          "instructions": "User-controlled or externally-supplied input reaches a dangerous sink (a shell command, a filesystem path, a raw query, or an outbound request URL) without validation or escaping."
+        },
+        "blocking_call_in_async": {
+          "type": "noul",
+          "instructions": "This code performs a blocking, synchronous operation (blocking filesystem, blocking network, thread sleep or CPU-heavy work) inside an async function without offloading it to a blocking thread pool."
+        }
+      }
+    },
+    "service/agent": {
+      "role": "Agent lifecycle: create, start, stop, status",
+      "files": [
+        {
+          "path": "backend/src/service/agent.rs",
+          "lines": 285,
+          "truncated": false
+        }
+      ],
+      "questions": {
+        "error_handling": {
+          "type": "score",
+          "instructions": "How well does this code handle failure and error conditions? Consider how fallible operations (I/O, network, database, external APIs) are treated and what happens to the caller when they fail.",
+          "criteria": [
+            "Failure paths are unhandled: unchecked unwrap/expect, panics, or silently discarded errors on operations that can fail in normal operation",
+            "Errors are surfaced but inconsistently: some paths return errors while others panic or swallow them, with no clear rule for which",
+            "Most fallible paths return or propagate errors; a few unchecked spots remain, mostly in startup or genuinely-impossible branches",
+            "Errors are consistently propagated with context, callers can distinguish failure modes, and no reachable panic remains on ordinary error paths"
+          ]
+        },
+        "readability": {
+          "type": "score",
+          "instructions": "How readable and well-organised is this code for a maintainer who is new to this file? Consider naming, function size and structure, nesting depth, and whether comments explain intent.",
+          "criteria": [
+            "Hard to follow: unclear or misleading names, deep nesting, long unstructured blocks where the flow cannot be traced",
+            "Understandable but uneven: naming and structure vary within the file, and a reader must re-read sections to follow the control flow",
+            "Clear names and structure throughout; a new maintainer can follow most flows on a first read without external help",
+            "Consistently clear: intention-revealing names, well-factored flows, and comments that explain why the code is this way rather than restating what it does"
+          ]
+        },
+        "modularity": {
+          "type": "score",
+          "instructions": "How well does this code separate concerns and limit coupling? Consider whether unrelated responsibilities sit together, whether callers reach into internals, and how far a change ripples.",
+          "criteria": [
+            "Concerns are entangled: unrelated responsibilities such as transport, business rules, persistence and I/O are mixed together in the same functions",
+            "Some separation exists, but responsibilities leak across boundaries and callers depend on implementation details rather than a defined interface",
+            "Clear responsibilities with defined interfaces; a change to one concern stays mostly local to this unit",
+            "Well-bounded units with narrow interfaces; dependencies point in one direction and units can be understood, replaced or tested independently"
+          ]
+        },
+        "security": {
+          "type": "score",
+          "instructions": "How well does this code guard against security and authorisation failures? Consider trust in external input, authorisation at privileged boundaries, credential handling, and whether secrets can leak into logs or errors.",
+          "criteria": [
+            "Trusts input or callers without checks, or handles credentials unsafely; privileged operations are reachable without an authorisation decision",
+            "Partial validation or authentication, but with real gaps: some privileged paths lack an authorisation check, or unsafe defaults are used",
+            "Input is validated and authorisation enforced on the main paths; only minor hardening gaps remain",
+            "Consistent input validation, an explicit authorisation decision at every privileged boundary, and secrets kept out of code, logs and error messages"
+          ]
+        },
+        "testability": {
+          "type": "score",
+          "instructions": "How easily could this code be verified by automated tests? Consider whether logic is separated from side effects, whether state is passed in or hidden in globals, and whether there are seams to substitute collaborators.",
+          "criteria": [
+            "Untestable as written: business logic is welded to I/O, globals and hard-coded externals with no seam to substitute",
+            "Testable only with heavy setup: logic and side effects are entangled, so exercising one path requires standing up most of the surrounding system",
+            "Core logic can be exercised with modest setup; some I/O still needs stubbing or a real dependency to be present",
+            "Logic is separated from effects behind clear seams, so behaviour can be exercised directly and deterministically"
+          ]
+        },
+        "hardcoded_secret": {
+          "type": "noul",
+          "instructions": "This code contains a hard-coded credential, API key, token or password that is written into the source rather than read from configuration or the environment."
+        },
+        "unvalidated_input_to_sink": {
+          "type": "noul",
+          "instructions": "User-controlled or externally-supplied input reaches a dangerous sink (a shell command, a filesystem path, a raw query, or an outbound request URL) without validation or escaping."
+        },
+        "blocking_call_in_async": {
+          "type": "noul",
+          "instructions": "This code performs a blocking, synchronous operation (blocking filesystem, blocking network, thread sleep or CPU-heavy work) inside an async function without offloading it to a blocking thread pool."
+        }
+      }
+    },
+    "service/auth": {
+      "role": "Authentication and session/credential handling",
+      "files": [
+        {
+          "path": "backend/src/service/auth.rs",
+          "lines": 237,
+          "truncated": false
+        }
+      ],
+      "questions": {
+        "error_handling": {
+          "type": "score",
+          "instructions": "How well does this code handle failure and error conditions? Consider how fallible operations (I/O, network, database, external APIs) are treated and what happens to the caller when they fail.",
+          "criteria": [
+            "Failure paths are unhandled: unchecked unwrap/expect, panics, or silently discarded errors on operations that can fail in normal operation",
+            "Errors are surfaced but inconsistently: some paths return errors while others panic or swallow them, with no clear rule for which",
+            "Most fallible paths return or propagate errors; a few unchecked spots remain, mostly in startup or genuinely-impossible branches",
+            "Errors are consistently propagated with context, callers can distinguish failure modes, and no reachable panic remains on ordinary error paths"
+          ]
+        },
+        "readability": {
+          "type": "score",
+          "instructions": "How readable and well-organised is this code for a maintainer who is new to this file? Consider naming, function size and structure, nesting depth, and whether comments explain intent.",
+          "criteria": [
+            "Hard to follow: unclear or misleading names, deep nesting, long unstructured blocks where the flow cannot be traced",
+            "Understandable but uneven: naming and structure vary within the file, and a reader must re-read sections to follow the control flow",
+            "Clear names and structure throughout; a new maintainer can follow most flows on a first read without external help",
+            "Consistently clear: intention-revealing names, well-factored flows, and comments that explain why the code is this way rather than restating what it does"
+          ]
+        },
+        "modularity": {
+          "type": "score",
+          "instructions": "How well does this code separate concerns and limit coupling? Consider whether unrelated responsibilities sit together, whether callers reach into internals, and how far a change ripples.",
+          "criteria": [
+            "Concerns are entangled: unrelated responsibilities such as transport, business rules, persistence and I/O are mixed together in the same functions",
+            "Some separation exists, but responsibilities leak across boundaries and callers depend on implementation details rather than a defined interface",
+            "Clear responsibilities with defined interfaces; a change to one concern stays mostly local to this unit",
+            "Well-bounded units with narrow interfaces; dependencies point in one direction and units can be understood, replaced or tested independently"
+          ]
+        },
+        "security": {
+          "type": "score",
+          "instructions": "How well does this code guard against security and authorisation failures? Consider trust in external input, authorisation at privileged boundaries, credential handling, and whether secrets can leak into logs or errors.",
+          "criteria": [
+            "Trusts input or callers without checks, or handles credentials unsafely; privileged operations are reachable without an authorisation decision",
+            "Partial validation or authentication, but with real gaps: some privileged paths lack an authorisation check, or unsafe defaults are used",
+            "Input is validated and authorisation enforced on the main paths; only minor hardening gaps remain",
+            "Consistent input validation, an explicit authorisation decision at every privileged boundary, and secrets kept out of code, logs and error messages"
+          ]
+        },
+        "testability": {
+          "type": "score",
+          "instructions": "How easily could this code be verified by automated tests? Consider whether logic is separated from side effects, whether state is passed in or hidden in globals, and whether there are seams to substitute collaborators.",
+          "criteria": [
+            "Untestable as written: business logic is welded to I/O, globals and hard-coded externals with no seam to substitute",
+            "Testable only with heavy setup: logic and side effects are entangled, so exercising one path requires standing up most of the surrounding system",
+            "Core logic can be exercised with modest setup; some I/O still needs stubbing or a real dependency to be present",
+            "Logic is separated from effects behind clear seams, so behaviour can be exercised directly and deterministically"
+          ]
+        },
+        "hardcoded_secret": {
+          "type": "noul",
+          "instructions": "This code contains a hard-coded credential, API key, token or password that is written into the source rather than read from configuration or the environment."
+        },
+        "unvalidated_input_to_sink": {
+          "type": "noul",
+          "instructions": "User-controlled or externally-supplied input reaches a dangerous sink (a shell command, a filesystem path, a raw query, or an outbound request URL) without validation or escaping."
+        },
+        "blocking_call_in_async": {
+          "type": "noul",
+          "instructions": "This code performs a blocking, synchronous operation (blocking filesystem, blocking network, thread sleep or CPU-heavy work) inside an async function without offloading it to a blocking thread pool."
+        }
+      }
+    },
+    "service/sync": {
+      "role": "Data synchronisation with upstream directory sources",
+      "files": [
+        {
+          "path": "backend/src/service/sync.rs",
+          "lines": 247,
+          "truncated": false
+        }
+      ],
+      "questions": {
+        "error_handling": {
+          "type": "score",
+          "instructions": "How well does this code handle failure and error conditions? Consider how fallible operations (I/O, network, database, external APIs) are treated and what happens to the caller when they fail.",
+          "criteria": [
+            "Failure paths are unhandled: unchecked unwrap/expect, panics, or silently discarded errors on operations that can fail in normal operation",
+            "Errors are surfaced but inconsistently: some paths return errors while others panic or swallow them, with no clear rule for which",
+            "Most fallible paths return or propagate errors; a few unchecked spots remain, mostly in startup or genuinely-impossible branches",
+            "Errors are consistently propagated with context, callers can distinguish failure modes, and no reachable panic remains on ordinary error paths"
+          ]
+        },
+        "readability": {
+          "type": "score",
+          "instructions": "How readable and well-organised is this code for a maintainer who is new to this file? Consider naming, function size and structure, nesting depth, and whether comments explain intent.",
+          "criteria": [
+            "Hard to follow: unclear or misleading names, deep nesting, long unstructured blocks where the flow cannot be traced",
+            "Understandable but uneven: naming and structure vary within the file, and a reader must re-read sections to follow the control flow",
+            "Clear names and structure throughout; a new maintainer can follow most flows on a first read without external help",
+            "Consistently clear: intention-revealing names, well-factored flows, and comments that explain why the code is this way rather than restating what it does"
+          ]
+        },
+        "modularity": {
+          "type": "score",
+          "instructions": "How well does this code separate concerns and limit coupling? Consider whether unrelated responsibilities sit together, whether callers reach into internals, and how far a change ripples.",
+          "criteria": [
+            "Concerns are entangled: unrelated responsibilities such as transport, business rules, persistence and I/O are mixed together in the same functions",
+            "Some separation exists, but responsibilities leak across boundaries and callers depend on implementation details rather than a defined interface",
+            "Clear responsibilities with defined interfaces; a change to one concern stays mostly local to this unit",
+            "Well-bounded units with narrow interfaces; dependencies point in one direction and units can be understood, replaced or tested independently"
+          ]
+        },
+        "security": {
+          "type": "score",
+          "instructions": "How well does this code guard against security and authorisation failures? Consider trust in external input, authorisation at privileged boundaries, credential handling, and whether secrets can leak into logs or errors.",
+          "criteria": [
+            "Trusts input or callers without checks, or handles credentials unsafely; privileged operations are reachable without an authorisation decision",
+            "Partial validation or authentication, but with real gaps: some privileged paths lack an authorisation check, or unsafe defaults are used",
+            "Input is validated and authorisation enforced on the main paths; only minor hardening gaps remain",
+            "Consistent input validation, an explicit authorisation decision at every privileged boundary, and secrets kept out of code, logs and error messages"
+          ]
+        },
+        "testability": {
+          "type": "score",
+          "instructions": "How easily could this code be verified by automated tests? Consider whether logic is separated from side effects, whether state is passed in or hidden in globals, and whether there are seams to substitute collaborators.",
+          "criteria": [
+            "Untestable as written: business logic is welded to I/O, globals and hard-coded externals with no seam to substitute",
+            "Testable only with heavy setup: logic and side effects are entangled, so exercising one path requires standing up most of the surrounding system",
+            "Core logic can be exercised with modest setup; some I/O still needs stubbing or a real dependency to be present",
+            "Logic is separated from effects behind clear seams, so behaviour can be exercised directly and deterministically"
+          ]
+        },
+        "hardcoded_secret": {
+          "type": "noul",
+          "instructions": "This code contains a hard-coded credential, API key, token or password that is written into the source rather than read from configuration or the environment."
+        },
+        "unvalidated_input_to_sink": {
+          "type": "noul",
+          "instructions": "User-controlled or externally-supplied input reaches a dangerous sink (a shell command, a filesystem path, a raw query, or an outbound request URL) without validation or escaping."
+        },
+        "blocking_call_in_async": {
+          "type": "noul",
+          "instructions": "This code performs a blocking, synchronous operation (blocking filesystem, blocking network, thread sleep or CPU-heavy work) inside an async function without offloading it to a blocking thread pool."
+        }
+      }
+    },
+    "service/organization": {
+      "role": "Organisation management and ownership",
+      "files": [
+        {
+          "path": "backend/src/service/organization.rs",
+          "lines": 227,
+          "truncated": false
+        }
+      ],
+      "questions": {
+        "error_handling": {
+          "type": "score",
+          "instructions": "How well does this code handle failure and error conditions? Consider how fallible operations (I/O, network, database, external APIs) are treated and what happens to the caller when they fail.",
+          "criteria": [
+            "Failure paths are unhandled: unchecked unwrap/expect, panics, or silently discarded errors on operations that can fail in normal operation",
+            "Errors are surfaced but inconsistently: some paths return errors while others panic or swallow them, with no clear rule for which",
+            "Most fallible paths return or propagate errors; a few unchecked spots remain, mostly in startup or genuinely-impossible branches",
+            "Errors are consistently propagated with context, callers can distinguish failure modes, and no reachable panic remains on ordinary error paths"
+          ]
+        },
+        "readability": {
+          "type": "score",
+          "instructions": "How readable and well-organised is this code for a maintainer who is new to this file? Consider naming, function size and structure, nesting depth, and whether comments explain intent.",
+          "criteria": [
+            "Hard to follow: unclear or misleading names, deep nesting, long unstructured blocks where the flow cannot be traced",
+            "Understandable but uneven: naming and structure vary within the file, and a reader must re-read sections to follow the control flow",
+            "Clear names and structure throughout; a new maintainer can follow most flows on a first read without external help",
+            "Consistently clear: intention-revealing names, well-factored flows, and comments that explain why the code is this way rather than restating what it does"
+          ]
+        },
+        "modularity": {
+          "type": "score",
+          "instructions": "How well does this code separate concerns and limit coupling? Consider whether unrelated responsibilities sit together, whether callers reach into internals, and how far a change ripples.",
+          "criteria": [
+            "Concerns are entangled: unrelated responsibilities such as transport, business rules, persistence and I/O are mixed together in the same functions",
+            "Some separation exists, but responsibilities leak across boundaries and callers depend on implementation details rather than a defined interface",
+            "Clear responsibilities with defined interfaces; a change to one concern stays mostly local to this unit",
+            "Well-bounded units with narrow interfaces; dependencies point in one direction and units can be understood, replaced or tested independently"
+          ]
+        },
+        "security": {
+          "type": "score",
+          "instructions": "How well does this code guard against security and authorisation failures? Consider trust in external input, authorisation at privileged boundaries, credential handling, and whether secrets can leak into logs or errors.",
+          "criteria": [
+            "Trusts input or callers without checks, or handles credentials unsafely; privileged operations are reachable without an authorisation decision",
+            "Partial validation or authentication, but with real gaps: some privileged paths lack an authorisation check, or unsafe defaults are used",
+            "Input is validated and authorisation enforced on the main paths; only minor hardening gaps remain",
+            "Consistent input validation, an explicit authorisation decision at every privileged boundary, and secrets kept out of code, logs and error messages"
+          ]
+        },
+        "testability": {
+          "type": "score",
+          "instructions": "How easily could this code be verified by automated tests? Consider whether logic is separated from side effects, whether state is passed in or hidden in globals, and whether there are seams to substitute collaborators.",
+          "criteria": [
+            "Untestable as written: business logic is welded to I/O, globals and hard-coded externals with no seam to substitute",
+            "Testable only with heavy setup: logic and side effects are entangled, so exercising one path requires standing up most of the surrounding system",
+            "Core logic can be exercised with modest setup; some I/O still needs stubbing or a real dependency to be present",
+            "Logic is separated from effects behind clear seams, so behaviour can be exercised directly and deterministically"
+          ]
+        },
+        "hardcoded_secret": {
+          "type": "noul",
+          "instructions": "This code contains a hard-coded credential, API key, token or password that is written into the source rather than read from configuration or the environment."
+        },
+        "unvalidated_input_to_sink": {
+          "type": "noul",
+          "instructions": "User-controlled or externally-supplied input reaches a dangerous sink (a shell command, a filesystem path, a raw query, or an outbound request URL) without validation or escaping."
+        },
+        "blocking_call_in_async": {
+          "type": "noul",
+          "instructions": "This code performs a blocking, synchronous operation (blocking filesystem, blocking network, thread sleep or CPU-heavy work) inside an async function without offloading it to a blocking thread pool."
+        }
+      }
+    },
+    "service/wechat_qr": {
+      "role": "WeChat QR-code login flow",
+      "files": [
+        {
+          "path": "backend/src/service/wechat_qr.rs",
+          "lines": 109,
+          "truncated": false
+        }
+      ],
+      "questions": {
+        "error_handling": {
+          "type": "score",
+          "instructions": "How well does this code handle failure and error conditions? Consider how fallible operations (I/O, network, database, external APIs) are treated and what happens to the caller when they fail.",
+          "criteria": [
+            "Failure paths are unhandled: unchecked unwrap/expect, panics, or silently discarded errors on operations that can fail in normal operation",
+            "Errors are surfaced but inconsistently: some paths return errors while others panic or swallow them, with no clear rule for which",
+            "Most fallible paths return or propagate errors; a few unchecked spots remain, mostly in startup or genuinely-impossible branches",
+            "Errors are consistently propagated with context, callers can distinguish failure modes, and no reachable panic remains on ordinary error paths"
+          ]
+        },
+        "readability": {
+          "type": "score",
+          "instructions": "How readable and well-organised is this code for a maintainer who is new to this file? Consider naming, function size and structure, nesting depth, and whether comments explain intent.",
+          "criteria": [
+            "Hard to follow: unclear or misleading names, deep nesting, long unstructured blocks where the flow cannot be traced",
+            "Understandable but uneven: naming and structure vary within the file, and a reader must re-read sections to follow the control flow",
+            "Clear names and structure throughout; a new maintainer can follow most flows on a first read without external help",
+            "Consistently clear: intention-revealing names, well-factored flows, and comments that explain why the code is this way rather than restating what it does"
+          ]
+        },
+        "modularity": {
+          "type": "score",
+          "instructions": "How well does this code separate concerns and limit coupling? Consider whether unrelated responsibilities sit together, whether callers reach into internals, and how far a change ripples.",
+          "criteria": [
+            "Concerns are entangled: unrelated responsibilities such as transport, business rules, persistence and I/O are mixed together in the same functions",
+            "Some separation exists, but responsibilities leak across boundaries and callers depend on implementation details rather than a defined interface",
+            "Clear responsibilities with defined interfaces; a change to one concern stays mostly local to this unit",
+            "Well-bounded units with narrow interfaces; dependencies point in one direction and units can be understood, replaced or tested independently"
+          ]
+        },
+        "security": {
+          "type": "score",
+          "instructions": "How well does this code guard against security and authorisation failures? Consider trust in external input, authorisation at privileged boundaries, credential handling, and whether secrets can leak into logs or errors.",
+          "criteria": [
+            "Trusts input or callers without checks, or handles credentials unsafely; privileged operations are reachable without an authorisation decision",
+            "Partial validation or authentication, but with real gaps: some privileged paths lack an authorisation check, or unsafe defaults are used",
+            "Input is validated and authorisation enforced on the main paths; only minor hardening gaps remain",
+            "Consistent input validation, an explicit authorisation decision at every privileged boundary, and secrets kept out of code, logs and error messages"
+          ]
+        },
+        "testability": {
+          "type": "score",
+          "instructions": "How easily could this code be verified by automated tests? Consider whether logic is separated from side effects, whether state is passed in or hidden in globals, and whether there are seams to substitute collaborators.",
+          "criteria": [
+            "Untestable as written: business logic is welded to I/O, globals and hard-coded externals with no seam to substitute",
+            "Testable only with heavy setup: logic and side effects are entangled, so exercising one path requires standing up most of the surrounding system",
+            "Core logic can be exercised with modest setup; some I/O still needs stubbing or a real dependency to be present",
+            "Logic is separated from effects behind clear seams, so behaviour can be exercised directly and deterministically"
+          ]
+        },
+        "hardcoded_secret": {
+          "type": "noul",
+          "instructions": "This code contains a hard-coded credential, API key, token or password that is written into the source rather than read from configuration or the environment."
+        },
+        "unvalidated_input_to_sink": {
+          "type": "noul",
+          "instructions": "User-controlled or externally-supplied input reaches a dangerous sink (a shell command, a filesystem path, a raw query, or an outbound request URL) without validation or escaping."
+        },
+        "blocking_call_in_async": {
+          "type": "noul",
+          "instructions": "This code performs a blocking, synchronous operation (blocking filesystem, blocking network, thread sleep or CPU-heavy work) inside an async function without offloading it to a blocking thread pool."
+        }
+      }
+    },
+    "api": {
+      "role": "HTTP API handlers: routing, request parsing, response shaping",
+      "files": [
+        {
+          "path": "backend/src/api/agent.rs",
+          "lines": 171,
+          "truncated": false
+        },
+        {
+          "path": "backend/src/api/auth.rs",
+          "lines": 65,
+          "truncated": false
+        },
+        {
+          "path": "backend/src/api/callback.rs",
+          "lines": 142,
+          "truncated": false
+        },
+        {
+          "path": "backend/src/api/mod.rs",
+          "lines": 7,
+          "truncated": false
+        },
+        {
+          "path": "backend/src/api/organization.rs",
+          "lines": 5,
+          "truncated": false
+        },
+        {
+          "path": "backend/src/api/sync.rs",
+          "lines": 124,
+          "truncated": false
+        },
+        {
+          "path": "backend/src/api/user.rs",
+          "lines": 25,
+          "truncated": false
+        },
+        {
+          "path": "backend/src/api/wechat.rs",
+          "lines": 133,
+          "truncated": false
+        }
+      ],
+      "questions": {
+        "error_handling": {
+          "type": "score",
+          "instructions": "How well does this code handle failure and error conditions? Consider how fallible operations (I/O, network, database, external APIs) are treated and what happens to the caller when they fail.",
+          "criteria": [
+            "Failure paths are unhandled: unchecked unwrap/expect, panics, or silently discarded errors on operations that can fail in normal operation",
+            "Errors are surfaced but inconsistently: some paths return errors while others panic or swallow them, with no clear rule for which",
+            "Most fallible paths return or propagate errors; a few unchecked spots remain, mostly in startup or genuinely-impossible branches",
+            "Errors are consistently propagated with context, callers can distinguish failure modes, and no reachable panic remains on ordinary error paths"
+          ]
+        },
+        "readability": {
+          "type": "score",
+          "instructions": "How readable and well-organised is this code for a maintainer who is new to this file? Consider naming, function size and structure, nesting depth, and whether comments explain intent.",
+          "criteria": [
+            "Hard to follow: unclear or misleading names, deep nesting, long unstructured blocks where the flow cannot be traced",
+            "Understandable but uneven: naming and structure vary within the file, and a reader must re-read sections to follow the control flow",
+            "Clear names and structure throughout; a new maintainer can follow most flows on a first read without external help",
+            "Consistently clear: intention-revealing names, well-factored flows, and comments that explain why the code is this way rather than restating what it does"
+          ]
+        },
+        "modularity": {
+          "type": "score",
+          "instructions": "How well does this code separate concerns and limit coupling? Consider whether unrelated responsibilities sit together, whether callers reach into internals, and how far a change ripples.",
+          "criteria": [
+            "Concerns are entangled: unrelated responsibilities such as transport, business rules, persistence and I/O are mixed together in the same functions",
+            "Some separation exists, but responsibilities leak across boundaries and callers depend on implementation details rather than a defined interface",
+            "Clear responsibilities with defined interfaces; a change to one concern stays mostly local to this unit",
+            "Well-bounded units with narrow interfaces; dependencies point in one direction and units can be understood, replaced or tested independently"
+          ]
+        },
+        "security": {
+          "type": "score",
+          "instructions": "How well does this code guard against security and authorisation failures? Consider trust in external input, authorisation at privileged boundaries, credential handling, and whether secrets can leak into logs or errors.",
+          "criteria": [
+            "Trusts input or callers without checks, or handles credentials unsafely; privileged operations are reachable without an authorisation decision",
+            "Partial validation or authentication, but with real gaps: some privileged paths lack an authorisation check, or unsafe defaults are used",
+            "Input is validated and authorisation enforced on the main paths; only minor hardening gaps remain",
+            "Consistent input validation, an explicit authorisation decision at every privileged boundary, and secrets kept out of code, logs and error messages"
+          ]
+        },
+        "testability": {
+          "type": "score",
+          "instructions": "How easily could this code be verified by automated tests? Consider whether logic is separated from side effects, whether state is passed in or hidden in globals, and whether there are seams to substitute collaborators.",
+          "criteria": [
+            "Untestable as written: business logic is welded to I/O, globals and hard-coded externals with no seam to substitute",
+            "Testable only with heavy setup: logic and side effects are entangled, so exercising one path requires standing up most of the surrounding system",
+            "Core logic can be exercised with modest setup; some I/O still needs stubbing or a real dependency to be present",
+            "Logic is separated from effects behind clear seams, so behaviour can be exercised directly and deterministically"
+          ]
+        },
+        "hardcoded_secret": {
+          "type": "noul",
+          "instructions": "This code contains a hard-coded credential, API key, token or password that is written into the source rather than read from configuration or the environment."
+        },
+        "unvalidated_input_to_sink": {
+          "type": "noul",
+          "instructions": "User-controlled or externally-supplied input reaches a dangerous sink (a shell command, a filesystem path, a raw query, or an outbound request URL) without validation or escaping."
+        },
+        "blocking_call_in_async": {
+          "type": "noul",
+          "instructions": "This code performs a blocking, synchronous operation (blocking filesystem, blocking network, thread sleep or CPU-heavy work) inside an async function without offloading it to a blocking thread pool."
+        }
+      }
+    },
+    "data_layer": {
+      "role": "Database entities and schema migrations (migrations sampled)",
+      "files": [
+        {
+          "path": "backend/src/entity/agent.rs",
+          "lines": 104,
+          "truncated": false
+        },
+        {
+          "path": "backend/src/entity/conversation.rs",
+          "lines": 54,
+          "truncated": false
+        },
+        {
+          "path": "backend/src/entity/mod.rs",
+          "lines": 8,
+          "truncated": false
+        },
+        {
+          "path": "backend/src/entity/org_member.rs",
+          "lines": 59,
+          "truncated": false
+        },
+        {
+          "path": "backend/src/entity/organization.rs",
+          "lines": 75,
+          "truncated": false
+        },
+        {
+          "path": "backend/src/entity/phone_code.rs",
+          "lines": 19,
+          "truncated": false
+        },
+        {
+          "path": "backend/src/entity/setting.rs",
+          "lines": 16,
+          "truncated": false
+        },
+        {
+          "path": "backend/src/entity/user.rs",
+          "lines": 81,
+          "truncated": false
+        },
+        {
+          "path": "backend/src/entity/user_agent.rs",
+          "lines": 43,
+          "truncated": false
+        },
+        {
+          "path": "backend/src/migration/m20240001_create_users.rs",
+          "lines": 71,
+          "truncated": false
+        },
+        {
+          "path": "backend/src/migration/m20240002_create_phone_codes.rs",
+          "lines": 78,
+          "truncated": false
+        },
+        {
+          "path": "backend/src/migration/m20240003_create_agents.rs",
+          "lines": 70,
+          "truncated": false
+        },
+        {
+          "path": "backend/src/migration/m20240019_create_settings.rs",
+          "lines": 72,
+          "truncated": false
+        },
+        {
+          "path": "backend/src/migration/m20240020_orgs_add_openai_fields.rs",
+          "lines": 53,
+          "truncated": false
+        },
+        {
+          "path": "backend/src/migration/mod.rs",
+          "lines": 50,
+          "truncated": false
+        }
+      ],
+      "questions": {
+        "error_handling": {
+          "type": "score",
+          "instructions": "How well does this code handle failure and error conditions? Consider how fallible operations (I/O, network, database, external APIs) are treated and what happens to the caller when they fail.",
+          "criteria": [
+            "Failure paths are unhandled: unchecked unwrap/expect, panics, or silently discarded errors on operations that can fail in normal operation",
+            "Errors are surfaced but inconsistently: some paths return errors while others panic or swallow them, with no clear rule for which",
+            "Most fallible paths return or propagate errors; a few unchecked spots remain, mostly in startup or genuinely-impossible branches",
+            "Errors are consistently propagated with context, callers can distinguish failure modes, and no reachable panic remains on ordinary error paths"
+          ]
+        },
+        "readability": {
+          "type": "score",
+          "instructions": "How readable and well-organised is this code for a maintainer who is new to this file? Consider naming, function size and structure, nesting depth, and whether comments explain intent.",
+          "criteria": [
+            "Hard to follow: unclear or misleading names, deep nesting, long unstructured blocks where the flow cannot be traced",
+            "Understandable but uneven: naming and structure vary within the file, and a reader must re-read sections to follow the control flow",
+            "Clear names and structure throughout; a new maintainer can follow most flows on a first read without external help",
+            "Consistently clear: intention-revealing names, well-factored flows, and comments that explain why the code is this way rather than restating what it does"
+          ]
+        },
+        "modularity": {
+          "type": "score",
+          "instructions": "How well does this code separate concerns and limit coupling? Consider whether unrelated responsibilities sit together, whether callers reach into internals, and how far a change ripples.",
+          "criteria": [
+            "Concerns are entangled: unrelated responsibilities such as transport, business rules, persistence and I/O are mixed together in the same functions",
+            "Some separation exists, but responsibilities leak across boundaries and callers depend on implementation details rather than a defined interface",
+            "Clear responsibilities with defined interfaces; a change to one concern stays mostly local to this unit",
+            "Well-bounded units with narrow interfaces; dependencies point in one direction and units can be understood, replaced or tested independently"
+          ]
+        },
+        "security": {
+          "type": "score",
+          "instructions": "How well does this code guard against security and authorisation failures? Consider trust in external input, authorisation at privileged boundaries, credential handling, and whether secrets can leak into logs or errors.",
+          "criteria": [
+            "Trusts input or callers without checks, or handles credentials unsafely; privileged operations are reachable without an authorisation decision",
+            "Partial validation or authentication, but with real gaps: some privileged paths lack an authorisation check, or unsafe defaults are used",
+            "Input is validated and authorisation enforced on the main paths; only minor hardening gaps remain",
+            "Consistent input validation, an explicit authorisation decision at every privileged boundary, and secrets kept out of code, logs and error messages"
+          ]
+        },
+        "testability": {
+          "type": "score",
+          "instructions": "How easily could this code be verified by automated tests? Consider whether logic is separated from side effects, whether state is passed in or hidden in globals, and whether there are seams to substitute collaborators.",
+          "criteria": [
+            "Untestable as written: business logic is welded to I/O, globals and hard-coded externals with no seam to substitute",
+            "Testable only with heavy setup: logic and side effects are entangled, so exercising one path requires standing up most of the surrounding system",
+            "Core logic can be exercised with modest setup; some I/O still needs stubbing or a real dependency to be present",
+            "Logic is separated from effects behind clear seams, so behaviour can be exercised directly and deterministically"
+          ]
+        },
+        "hardcoded_secret": {
+          "type": "noul",
+          "instructions": "This code contains a hard-coded credential, API key, token or password that is written into the source rather than read from configuration or the environment."
+        },
+        "unvalidated_input_to_sink": {
+          "type": "noul",
+          "instructions": "User-controlled or externally-supplied input reaches a dangerous sink (a shell command, a filesystem path, a raw query, or an outbound request URL) without validation or escaping."
+        },
+        "blocking_call_in_async": {
+          "type": "noul",
+          "instructions": "This code performs a blocking, synchronous operation (blocking filesystem, blocking network, thread sleep or CPU-heavy work) inside an async function without offloading it to a blocking thread pool."
+        }
+      }
+    },
+    "config_middleware": {
+      "role": "Configuration loading and HTTP middleware (auth layer)",
+      "files": [
+        {
+          "path": "backend/src/config.rs",
+          "lines": 132,
+          "truncated": false
+        },
+        {
+          "path": "backend/src/middleware/auth.rs",
+          "lines": 37,
+          "truncated": false
+        },
+        {
+          "path": "backend/src/middleware/mod.rs",
+          "lines": 1,
+          "truncated": false
+        }
+      ],
+      "questions": {
+        "error_handling": {
+          "type": "score",
+          "instructions": "How well does this code handle failure and error conditions? Consider how fallible operations (I/O, network, database, external APIs) are treated and what happens to the caller when they fail.",
+          "criteria": [
+            "Failure paths are unhandled: unchecked unwrap/expect, panics, or silently discarded errors on operations that can fail in normal operation",
+            "Errors are surfaced but inconsistently: some paths return errors while others panic or swallow them, with no clear rule for which",
+            "Most fallible paths return or propagate errors; a few unchecked spots remain, mostly in startup or genuinely-impossible branches",
+            "Errors are consistently propagated with context, callers can distinguish failure modes, and no reachable panic remains on ordinary error paths"
+          ]
+        },
+        "readability": {
+          "type": "score",
+          "instructions": "How readable and well-organised is this code for a maintainer who is new to this file? Consider naming, function size and structure, nesting depth, and whether comments explain intent.",
+          "criteria": [
+            "Hard to follow: unclear or misleading names, deep nesting, long unstructured blocks where the flow cannot be traced",
+            "Understandable but uneven: naming and structure vary within the file, and a reader must re-read sections to follow the control flow",
+            "Clear names and structure throughout; a new maintainer can follow most flows on a first read without external help",
+            "Consistently clear: intention-revealing names, well-factored flows, and comments that explain why the code is this way rather than restating what it does"
+          ]
+        },
+        "modularity": {
+          "type": "score",
+          "instructions": "How well does this code separate concerns and limit coupling? Consider whether unrelated responsibilities sit together, whether callers reach into internals, and how far a change ripples.",
+          "criteria": [
+            "Concerns are entangled: unrelated responsibilities such as transport, business rules, persistence and I/O are mixed together in the same functions",
+            "Some separation exists, but responsibilities leak across boundaries and callers depend on implementation details rather than a defined interface",
+            "Clear responsibilities with defined interfaces; a change to one concern stays mostly local to this unit",
+            "Well-bounded units with narrow interfaces; dependencies point in one direction and units can be understood, replaced or tested independently"
+          ]
+        },
+        "security": {
+          "type": "score",
+          "instructions": "How well does this code guard against security and authorisation failures? Consider trust in external input, authorisation at privileged boundaries, credential handling, and whether secrets can leak into logs or errors.",
+          "criteria": [
+            "Trusts input or callers without checks, or handles credentials unsafely; privileged operations are reachable without an authorisation decision",
+            "Partial validation or authentication, but with real gaps: some privileged paths lack an authorisation check, or unsafe defaults are used",
+            "Input is validated and authorisation enforced on the main paths; only minor hardening gaps remain",
+            "Consistent input validation, an explicit authorisation decision at every privileged boundary, and secrets kept out of code, logs and error messages"
+          ]
+        },
+        "testability": {
+          "type": "score",
+          "instructions": "How easily could this code be verified by automated tests? Consider whether logic is separated from side effects, whether state is passed in or hidden in globals, and whether there are seams to substitute collaborators.",
+          "criteria": [
+            "Untestable as written: business logic is welded to I/O, globals and hard-coded externals with no seam to substitute",
+            "Testable only with heavy setup: logic and side effects are entangled, so exercising one path requires standing up most of the surrounding system",
+            "Core logic can be exercised with modest setup; some I/O still needs stubbing or a real dependency to be present",
+            "Logic is separated from effects behind clear seams, so behaviour can be exercised directly and deterministically"
+          ]
+        },
+        "hardcoded_secret": {
+          "type": "noul",
+          "instructions": "This code contains a hard-coded credential, API key, token or password that is written into the source rather than read from configuration or the environment."
+        },
+        "unvalidated_input_to_sink": {
+          "type": "noul",
+          "instructions": "User-controlled or externally-supplied input reaches a dangerous sink (a shell command, a filesystem path, a raw query, or an outbound request URL) without validation or escaping."
+        },
+        "blocking_call_in_async": {
+          "type": "noul",
+          "instructions": "This code performs a blocking, synchronous operation (blocking filesystem, blocking network, thread sleep or CPU-heavy work) inside an async function without offloading it to a blocking thread pool."
+        }
+      }
+    },
+    "app_entry": {
+      "role": "Application entrypoint, router wiring, background schedulers",
+      "files": [
+        {
+          "path": "backend/src/main.rs",
+          "lines": 561,
+          "truncated": false
+        },
+        {
+          "path": "backend/src/lib.rs",
+          "lines": 82,
+          "truncated": false
+        }
+      ],
+      "questions": {
+        "error_handling": {
+          "type": "score",
+          "instructions": "How well does this code handle failure and error conditions? Consider how fallible operations (I/O, network, database, external APIs) are treated and what happens to the caller when they fail.",
+          "criteria": [
+            "Failure paths are unhandled: unchecked unwrap/expect, panics, or silently discarded errors on operations that can fail in normal operation",
+            "Errors are surfaced but inconsistently: some paths return errors while others panic or swallow them, with no clear rule for which",
+            "Most fallible paths return or propagate errors; a few unchecked spots remain, mostly in startup or genuinely-impossible branches",
+            "Errors are consistently propagated with context, callers can distinguish failure modes, and no reachable panic remains on ordinary error paths"
+          ]
+        },
+        "readability": {
+          "type": "score",
+          "instructions": "How readable and well-organised is this code for a maintainer who is new to this file? Consider naming, function size and structure, nesting depth, and whether comments explain intent.",
+          "criteria": [
+            "Hard to follow: unclear or misleading names, deep nesting, long unstructured blocks where the flow cannot be traced",
+            "Understandable but uneven: naming and structure vary within the file, and a reader must re-read sections to follow the control flow",
+            "Clear names and structure throughout; a new maintainer can follow most flows on a first read without external help",
+            "Consistently clear: intention-revealing names, well-factored flows, and comments that explain why the code is this way rather than restating what it does"
+          ]
+        },
+        "modularity": {
+          "type": "score",
+          "instructions": "How well does this code separate concerns and limit coupling? Consider whether unrelated responsibilities sit together, whether callers reach into internals, and how far a change ripples.",
+          "criteria": [
+            "Concerns are entangled: unrelated responsibilities such as transport, business rules, persistence and I/O are mixed together in the same functions",
+            "Some separation exists, but responsibilities leak across boundaries and callers depend on implementation details rather than a defined interface",
+            "Clear responsibilities with defined interfaces; a change to one concern stays mostly local to this unit",
+            "Well-bounded units with narrow interfaces; dependencies point in one direction and units can be understood, replaced or tested independently"
+          ]
+        },
+        "security": {
+          "type": "score",
+          "instructions": "How well does this code guard against security and authorisation failures? Consider trust in external input, authorisation at privileged boundaries, credential handling, and whether secrets can leak into logs or errors.",
+          "criteria": [
+            "Trusts input or callers without checks, or handles credentials unsafely; privileged operations are reachable without an authorisation decision",
+            "Partial validation or authentication, but with real gaps: some privileged paths lack an authorisation check, or unsafe defaults are used",
+            "Input is validated and authorisation enforced on the main paths; only minor hardening gaps remain",
+            "Consistent input validation, an explicit authorisation decision at every privileged boundary, and secrets kept out of code, logs and error messages"
+          ]
+        },
+        "testability": {
+          "type": "score",
+          "instructions": "How easily could this code be verified by automated tests? Consider whether logic is separated from side effects, whether state is passed in or hidden in globals, and whether there are seams to substitute collaborators.",
+          "criteria": [
+            "Untestable as written: business logic is welded to I/O, globals and hard-coded externals with no seam to substitute",
+            "Testable only with heavy setup: logic and side effects are entangled, so exercising one path requires standing up most of the surrounding system",
+            "Core logic can be exercised with modest setup; some I/O still needs stubbing or a real dependency to be present",
+            "Logic is separated from effects behind clear seams, so behaviour can be exercised directly and deterministically"
+          ]
+        },
+        "hardcoded_secret": {
+          "type": "noul",
+          "instructions": "This code contains a hard-coded credential, API key, token or password that is written into the source rather than read from configuration or the environment."
+        },
+        "unvalidated_input_to_sink": {
+          "type": "noul",
+          "instructions": "User-controlled or externally-supplied input reaches a dangerous sink (a shell command, a filesystem path, a raw query, or an outbound request URL) without validation or escaping."
+        },
+        "blocking_call_in_async": {
+          "type": "noul",
+          "instructions": "This code performs a blocking, synchronous operation (blocking filesystem, blocking network, thread sleep or CPU-heavy work) inside an async function without offloading it to a blocking thread pool."
+        }
+      }
+    },
+    "documentation": {
+      "role": "Project documentation",
+      "files": [
+        {
+          "path": "README.md",
+          "lines": 286,
+          "truncated": false
+        },
+        {
+          "path": "README.zh-CN.md",
+          "lines": 247,
+          "truncated": false
+        },
+        {
+          "path": "CHANGELOG.md",
+          "lines": 61,
+          "truncated": false
+        },
+        {
+          "path": "CONTRIBUTING.md",
+          "lines": 102,
+          "truncated": false
+        },
+        {
+          "path": "docs/architecture.md",
+          "lines": 109,
+          "truncated": false
+        },
+        {
+          "path": "docs/deployment.md",
+          "lines": 135,
+          "truncated": false
+        }
+      ],
+      "questions": {
+        "doc_completeness": {
+          "type": "score",
+          "instructions": "How completely does this documentation equip a new engineer to understand, run, operate and change this system? Consider whether the key concepts, setup steps, architecture and operational procedures are all covered.",
+          "criteria": [
+            "Sparse or missing: a reader cannot get the system running or understand its shape from these documents alone",
+            "Covers the basics such as setup and purpose, but architecture, operational procedures or failure modes are absent or hand-waved",
+            "Covers purpose, setup, architecture and day-to-day operation; a new engineer could become productive with only minor gaps",
+            "Comprehensive and maintained: concepts, architecture, setup, operations and failure handling are all documented with enough specificity to act on"
+          ]
+        },
+        "doc_specificity": {
+          "type": "score",
+          "instructions": "How specific and verifiable is this documentation? Consider whether it names concrete commands, endpoints, configuration keys and expected outcomes, rather than describing things in general terms that a reader must guess at.",
+          "criteria": [
+            "Generic prose with no concrete commands, keys or endpoints a reader can act on",
+            "Some concrete details, but key steps are vague or outdated relative to the system described elsewhere in these documents",
+            "Concrete and mostly accurate: real commands, configuration keys and endpoints, with only occasional gaps",
+            "Precise and verifiable throughout: exact commands, configuration keys, endpoint paths and expected outcomes a reader can check against"
+          ]
+        }
+      }
+    },
+    "infrastructure": {
+      "role": "Build, container and deployment configuration",
+      "files": [
+        {
+          "path": "docker/desktop/Dockerfile",
+          "lines": 89,
+          "truncated": false
+        },
+        {
+          "path": "docker/desktop/Dockerfile-next1",
+          "lines": 19,
+          "truncated": false
+        },
+        {
+          "path": "docker/desktop/Dockerfile-next2",
+          "lines": 26,
+          "truncated": false
+        },
+        {
+          "path": "docker/sidecar/Dockerfile",
+          "lines": 43,
+          "truncated": false
+        },
+        {
+          "path": "docker/desktop/entrypoint.sh",
+          "lines": 129,
+          "truncated": false
+        },
+        {
+          "path": "docker/sidecar/entrypoint.sh",
+          "lines": 33,
+          "truncated": false
+        },
+        {
+          "path": "docker/sidecar/stream-ctrl.py",
+          "lines": 114,
+          "truncated": false
+        },
+        {
+          "path": "docker/sidecar/mediamtx.yml",
+          "lines": 36,
+          "truncated": false
+        },
+        {
+          "path": "docker/desktop/install.sh",
+          "lines": 10,
+          "truncated": false
+        },
+        {
+          "path": "docker/desktop/run-local.sh",
+          "lines": 103,
+          "truncated": false
+        },
+        {
+          "path": ".github/workflows/backend.yml",
+          "lines": 52,
+          "truncated": false
+        },
+        {
+          "path": "deploy/test/deployment.yaml",
+          "lines": 90,
+          "truncated": false
+        },
+        {
+          "path": "deploy/test/service.yaml",
+          "lines": 19,
+          "truncated": false
+        },
+        {
+          "path": "deploy/test/init.sql",
+          "lines": 32,
+          "truncated": false
+        }
+      ],
+      "questions": {
+        "build_reproducibility": {
+          "type": "score",
+          "instructions": "How reproducible and deterministic is the build and deployment path? Consider pinned dependencies, pinned base images and toolchain versions, lockfiles, and whether the same input yields the same artifact.",
+          "criteria": [
+            "Unpinned and non-deterministic: floating base images or dependency ranges mean two builds can differ with no record of why",
+            "Partially pinned: some inputs are pinned while others float, or the toolchain version is not fixed",
+            "Pinned dependencies, base images and toolchain; a rebuild reproduces the same artifact",
+            "Pinned and verifiable: lockfiles enforced in CI, images referenced by digest or immutable tag, and the build is hermetic"
+          ]
+        },
+        "deployment_safety": {
+          "type": "score",
+          "instructions": "How safely can this deployment configuration be operated? Consider health checks, resource limits, rollout and rollback behaviour, secret injection, and what happens on failure.",
+          "criteria": [
+            "Unsafe by omission: no health checks, no resource limits, secrets or privileged settings embedded, and a failure leaves the system in an unknown state",
+            "Basic deployment works, but important safety features such as probes, resource limits or safe secret handling are missing",
+            "Health checks, resource limits and secret injection are in place; rollout behaviour is predictable",
+            "Failures are contained and recoverable: probes, limits, scoped secrets, and a rollout strategy with a clear rollback path"
+          ]
+        },
+        "secret_hygiene": {
+          "type": "score",
+          "instructions": "How well do these build and deployment files keep credentials out of the repository and out of build artifacts? Consider use of build arguments, copied configuration files, and files that would bake secrets into an image layer.",
+          "criteria": [
+            "Secrets are written into committed files, or copied into an image in a way that bakes them permanently into a layer",
+            "Secrets mostly come from outside, but some are passed through mechanisms that leave them in image layers, history or logs",
+            "Secrets are injected at runtime rather than build time, with only minor leakage risk from build arguments or copied files",
+            "Secrets are consistently injected at runtime from a secret store, never written into the repository, image layers, or build logs"
+          ]
+        }
+      }
+    },
+    "tests": {
+      "role": "Existing automated tests",
+      "files": [
+        {
+          "path": "backend/src/main.rs",
+          "lines": 196
+        },
+        {
+          "path": "backend/src/service/callback.rs",
+          "lines": 76
+        },
+        {
+          "path": "backend/src/service/lark_bot.rs",
+          "lines": 20
+        },
+        {
+          "path": "backend/src/service/user_home.rs",
+          "lines": 178
+        }
+      ],
+      "questions": {
+        "test_depth": {
+          "type": "score",
+          "instructions": "How much real behaviour do these tests pin down? Consider whether they assert on meaningful outcomes such as error paths and edge cases, or merely confirm that code runs.",
+          "criteria": [
+            "Tests are absent, or assert only that a call does not crash without checking any outcome",
+            "Happy paths are asserted, but error paths, boundaries and edge cases are not covered",
+            "Main behaviours including some error paths and boundaries are asserted with meaningful expectations",
+            "Behaviour is pinned down thoroughly: error paths, boundaries and edge cases are asserted, so a regression in behaviour fails a test"
+          ]
+        },
+        "test_breadth": {
+          "type": "score",
+          "instructions": "How much of this system's surface do these tests reach? Consider how many of the system's main modules and workflows are exercised at all.",
+          "criteria": [
+            "No meaningful surface is exercised; the bulk of the system has no test that touches it",
+            "A small fraction of the system is exercised, concentrated in one or two areas while the rest is untested",
+            "A substantial portion of the core workflows is exercised, with some modules or cross-module paths still untested",
+            "Broad coverage across the system's main modules and their integration paths"
+          ]
+        },
+        "test_isolation": {
+          "type": "score",
+          "instructions": "How isolated and reliable are these tests? Consider dependence on external services, shared mutable state, ordering assumptions, and whether a failure here points at a real defect.",
+          "criteria": [
+            "Tests depend on external services or shared state, so results are flaky or depend on run order",
+            "Mostly isolated, but some tests need a live dependency or shared fixture to pass",
+            "Well isolated and deterministic, with dependencies replaced or scoped per test",
+            "Fully hermetic: each test owns its state, no external dependency, and a failure reliably indicates a real defect"
+          ]
+        }
+      }
+    }
+  },
+  "responses": {
+    "service/lark_bot": {
+      "model": "jev-1.13.0",
+      "answers": {
+        "error_handling": {
+          "type": "score",
+          "score": 1.56,
+          "confidence": 0.55,
+          "legend": {
+            "0": "Failure paths are unhandled: unchecked unwrap/expect, panics, or silently discarded errors on operations that can fail in normal operation",
+            "1": "Errors are surfaced but inconsistently: some paths return errors while others panic or swallow them, with no clear rule for which",
+            "2": "Most fallible paths return or propagate errors; a few unchecked spots remain, mostly in startup or genuinely-impossible branches",
+            "3": "Errors are consistently propagated with context, callers can distinguish failure modes, and no reachable panic remains on ordinary error paths"
+          },
+          "probabilities": {
+            "0": 0.01,
+            "1": 0.42,
+            "2": 0.5700000000000001,
+            "3": 0.0
+          }
+        },
+        "readability": {
+          "type": "score",
+          "score": 2.36,
+          "confidence": 0.62,
+          "legend": {
+            "0": "Hard to follow: unclear or misleading names, deep nesting, long unstructured blocks where the flow cannot be traced",
+            "1": "Understandable but uneven: naming and structure vary within the file, and a reader must re-read sections to follow the control flow",
+            "2": "Clear names and structure throughout; a new maintainer can follow most flows on a first read without external help",
+            "3": "Consistently clear: intention-revealing names, well-factored flows, and comments that explain why the code is this way rather than restating what it does"
+          },
+          "probabilities": {
+            "0": 0.0,
+            "1": 0.01,
+            "2": 0.62,
+            "3": 0.37
+          }
+        },
+        "modularity": {
+          "type": "score",
+          "score": 0.59,
+          "confidence": 0.57,
+          "legend": {
+            "0": "Concerns are entangled: unrelated responsibilities such as transport, business rules, persistence and I/O are mixed together in the same functions",
+            "1": "Some separation exists, but responsibilities leak across boundaries and callers depend on implementation details rather than a defined interface",
+            "2": "Clear responsibilities with defined interfaces; a change to one concern stays mostly local to this unit",
+            "3": "Well-bounded units with narrow interfaces; dependencies point in one direction and units can be understood, replaced or tested independently"
+          },
+          "probabilities": {
+            "0": 0.42,
+            "1": 0.57,
+            "2": 0.01,
+            "3": 0.0
+          }
+        },
+        "security": {
+          "type": "score",
+          "score": 0.95,
+          "confidence": 0.74,
+          "legend": {
+            "0": "Trusts input or callers without checks, or handles credentials unsafely; privileged operations are reachable without an authorisation decision",
+            "1": "Partial validation or authentication, but with real gaps: some privileged paths lack an authorisation check, or unsafe defaults are used",
+            "2": "Input is validated and authorisation enforced on the main paths; only minor hardening gaps remain",
+            "3": "Consistent input validation, an explicit authorisation decision at every privileged boundary, and secrets kept out of code, logs and error messages"
+          },
+          "probabilities": {
+            "0": 0.16,
+            "1": 0.74,
+            "2": 0.1,
+            "3": 0.0
+          }
+        },
+        "testability": {
+          "type": "score",
+          "score": 1.1,
+          "confidence": 0.84,
+          "legend": {
+            "0": "Untestable as written: business logic is welded to I/O, globals and hard-coded externals with no seam to substitute",
+            "1": "Testable only with heavy setup: logic and side effects are entangled, so exercising one path requires standing up most of the surrounding system",
+            "2": "Core logic can be exercised with modest setup; some I/O still needs stubbing or a real dependency to be present",
+            "3": "Logic is separated from effects behind clear seams, so behaviour can be exercised directly and deterministically"
+          },
+          "probabilities": {
+            "0": 0.03,
+            "1": 0.84,
+            "2": 0.13,
+            "3": 0.0
+          }
+        },
+        "hardcoded_secret": {
+          "type": "noul",
+          "noul": 0.07
+        },
+        "unvalidated_input_to_sink": {
+          "type": "noul",
+          "noul": 0.42
+        },
+        "blocking_call_in_async": {
+          "type": "noul",
+          "noul": 0.3
+        }
+      },
+      "usage": {
+        "input_tokens": 10493,
+        "output_tokens": 137
+      }
+    },
+    "service/k8s": {
+      "model": "jev-1.13.0",
+      "answers": {
+        "error_handling": {
+          "type": "score",
+          "score": 1.84,
+          "confidence": 0.62,
+          "legend": {
+            "0": "Failure paths are unhandled: unchecked unwrap/expect, panics, or silently discarded errors on operations that can fail in normal operation",
+            "1": "Errors are surfaced but inconsistently: some paths return errors while others panic or swallow them, with no clear rule for which",
+            "2": "Most fallible paths return or propagate errors; a few unchecked spots remain, mostly in startup or genuinely-impossible branches",
+            "3": "Errors are consistently propagated with context, callers can distinguish failure modes, and no reachable panic remains on ordinary error paths"
+          },
+          "probabilities": {
+            "0": 0.0,
+            "1": 0.26,
+            "2": 0.63,
+            "3": 0.11
+          }
+        },
+        "readability": {
+          "type": "score",
+          "score": 2.64,
+          "confidence": 0.64,
+          "legend": {
+            "0": "Hard to follow: unclear or misleading names, deep nesting, long unstructured blocks where the flow cannot be traced",
+            "1": "Understandable but uneven: naming and structure vary within the file, and a reader must re-read sections to follow the control flow",
+            "2": "Clear names and structure throughout; a new maintainer can follow most flows on a first read without external help",
+            "3": "Consistently clear: intention-revealing names, well-factored flows, and comments that explain why the code is this way rather than restating what it does"
+          },
+          "probabilities": {
+            "0": 0.0,
+            "1": 0.01,
+            "2": 0.34,
+            "3": 0.65
+          }
+        },
+        "modularity": {
+          "type": "score",
+          "score": 1.15,
+          "confidence": 0.68,
+          "legend": {
+            "0": "Concerns are entangled: unrelated responsibilities such as transport, business rules, persistence and I/O are mixed together in the same functions",
+            "1": "Some separation exists, but responsibilities leak across boundaries and callers depend on implementation details rather than a defined interface",
+            "2": "Clear responsibilities with defined interfaces; a change to one concern stays mostly local to this unit",
+            "3": "Well-bounded units with narrow interfaces; dependencies point in one direction and units can be understood, replaced or tested independently"
+          },
+          "probabilities": {
+            "0": 0.09,
+            "1": 0.68,
+            "2": 0.22,
+            "3": 0.01
+          }
+        },
+        "security": {
+          "type": "score",
+          "score": 0.53,
+          "confidence": 0.47,
+          "legend": {
+            "0": "Trusts input or callers without checks, or handles credentials unsafely; privileged operations are reachable without an authorisation decision",
+            "1": "Partial validation or authentication, but with real gaps: some privileged paths lack an authorisation check, or unsafe defaults are used",
+            "2": "Input is validated and authorisation enforced on the main paths; only minor hardening gaps remain",
+            "3": "Consistent input validation, an explicit authorisation decision at every privileged boundary, and secrets kept out of code, logs and error messages"
+          },
+          "probabilities": {
+            "0": 0.5,
+            "1": 0.47,
+            "2": 0.03,
+            "3": 0.0
+          }
+        },
+        "testability": {
+          "type": "score",
+          "score": 1.38,
+          "confidence": 0.58,
+          "legend": {
+            "0": "Untestable as written: business logic is welded to I/O, globals and hard-coded externals with no seam to substitute",
+            "1": "Testable only with heavy setup: logic and side effects are entangled, so exercising one path requires standing up most of the surrounding system",
+            "2": "Core logic can be exercised with modest setup; some I/O still needs stubbing or a real dependency to be present",
+            "3": "Logic is separated from effects behind clear seams, so behaviour can be exercised directly and deterministically"
+          },
+          "probabilities": {
+            "0": 0.02,
+            "1": 0.59,
+            "2": 0.39,
+            "3": 0.0
+          }
+        },
+        "hardcoded_secret": {
+          "type": "noul",
+          "noul": 0.06
+        },
+        "unvalidated_input_to_sink": {
+          "type": "noul",
+          "noul": 0.84
+        },
+        "blocking_call_in_async": {
+          "type": "noul",
+          "noul": 0.55
+        }
+      },
+      "usage": {
+        "input_tokens": 8740,
+        "output_tokens": 137
+      }
+    },
+    "service/user_home": {
+      "model": "jev-1.13.0",
+      "answers": {
+        "error_handling": {
+          "type": "score",
+          "score": 2.56,
+          "confidence": 0.56,
+          "legend": {
+            "0": "Failure paths are unhandled: unchecked unwrap/expect, panics, or silently discarded errors on operations that can fail in normal operation",
+            "1": "Errors are surfaced but inconsistently: some paths return errors while others panic or swallow them, with no clear rule for which",
+            "2": "Most fallible paths return or propagate errors; a few unchecked spots remain, mostly in startup or genuinely-impossible branches",
+            "3": "Errors are consistently propagated with context, callers can distinguish failure modes, and no reachable panic remains on ordinary error paths"
+          },
+          "probabilities": {
+            "0": 0.0,
+            "1": 0.09,
+            "2": 0.26,
+            "3": 0.65
+          }
+        },
+        "readability": {
+          "type": "score",
+          "score": 2.95,
+          "confidence": 0.95,
+          "legend": {
+            "0": "Hard to follow: unclear or misleading names, deep nesting, long unstructured blocks where the flow cannot be traced",
+            "1": "Understandable but uneven: naming and structure vary within the file, and a reader must re-read sections to follow the control flow",
+            "2": "Clear names and structure throughout; a new maintainer can follow most flows on a first read without external help",
+            "3": "Consistently clear: intention-revealing names, well-factored flows, and comments that explain why the code is this way rather than restating what it does"
+          },
+          "probabilities": {
+            "0": 0.0,
+            "1": 0.0,
+            "2": 0.05,
+            "3": 0.95
+          }
+        },
+        "modularity": {
+          "type": "score",
+          "score": 2.24,
+          "confidence": 0.58,
+          "legend": {
+            "0": "Concerns are entangled: unrelated responsibilities such as transport, business rules, persistence and I/O are mixed together in the same functions",
+            "1": "Some separation exists, but responsibilities leak across boundaries and callers depend on implementation details rather than a defined interface",
+            "2": "Clear responsibilities with defined interfaces; a change to one concern stays mostly local to this unit",
+            "3": "Well-bounded units with narrow interfaces; dependencies point in one direction and units can be understood, replaced or tested independently"
+          },
+          "probabilities": {
+            "0": 0.0,
+            "1": 0.09,
+            "2": 0.58,
+            "3": 0.33
+          }
+        },
+        "security": {
+          "type": "score",
+          "score": 0.61,
+          "confidence": 0.39,
+          "legend": {
+            "0": "Trusts input or callers without checks, or handles credentials unsafely; privileged operations are reachable without an authorisation decision",
+            "1": "Partial validation or authentication, but with real gaps: some privileged paths lack an authorisation check, or unsafe defaults are used",
+            "2": "Input is validated and authorisation enforced on the main paths; only minor hardening gaps remain",
+            "3": "Consistent input validation, an explicit authorisation decision at every privileged boundary, and secrets kept out of code, logs and error messages"
+          },
+          "probabilities": {
+            "0": 0.5,
+            "1": 0.4,
+            "2": 0.09,
+            "3": 0.01
+          }
+        },
+        "testability": {
+          "type": "score",
+          "score": 1.89,
+          "confidence": 0.79,
+          "legend": {
+            "0": "Untestable as written: business logic is welded to I/O, globals and hard-coded externals with no seam to substitute",
+            "1": "Testable only with heavy setup: logic and side effects are entangled, so exercising one path requires standing up most of the surrounding system",
+            "2": "Core logic can be exercised with modest setup; some I/O still needs stubbing or a real dependency to be present",
+            "3": "Logic is separated from effects behind clear seams, so behaviour can be exercised directly and deterministically"
+          },
+          "probabilities": {
+            "0": 0.02,
+            "1": 0.13,
+            "2": 0.8,
+            "3": 0.05
+          }
+        },
+        "hardcoded_secret": {
+          "type": "noul",
+          "noul": 0.36
+        },
+        "unvalidated_input_to_sink": {
+          "type": "noul",
+          "noul": 0.57
+        },
+        "blocking_call_in_async": {
+          "type": "noul",
+          "noul": 0.12
+        }
+      },
+      "usage": {
+        "input_tokens": 6532,
+        "output_tokens": 137
+      }
+    },
+    "service/callback": {
+      "model": "jev-1.13.0",
+      "answers": {
+        "error_handling": {
+          "type": "score",
+          "score": 1.99,
+          "confidence": 0.49,
+          "legend": {
+            "0": "Failure paths are unhandled: unchecked unwrap/expect, panics, or silently discarded errors on operations that can fail in normal operation",
+            "1": "Errors are surfaced but inconsistently: some paths return errors while others panic or swallow them, with no clear rule for which",
+            "2": "Most fallible paths return or propagate errors; a few unchecked spots remain, mostly in startup or genuinely-impossible branches",
+            "3": "Errors are consistently propagated with context, callers can distinguish failure modes, and no reachable panic remains on ordinary error paths"
+          },
+          "probabilities": {
+            "0": 0.01,
+            "1": 0.24,
+            "2": 0.5,
+            "3": 0.25
+          }
+        },
+        "readability": {
+          "type": "score",
+          "score": 2.96,
+          "confidence": 0.96,
+          "legend": {
+            "0": "Hard to follow: unclear or misleading names, deep nesting, long unstructured blocks where the flow cannot be traced",
+            "1": "Understandable but uneven: naming and structure vary within the file, and a reader must re-read sections to follow the control flow",
+            "2": "Clear names and structure throughout; a new maintainer can follow most flows on a first read without external help",
+            "3": "Consistently clear: intention-revealing names, well-factored flows, and comments that explain why the code is this way rather than restating what it does"
+          },
+          "probabilities": {
+            "0": 0.0,
+            "1": 0.0,
+            "2": 0.04,
+            "3": 0.96
+          }
+        },
+        "modularity": {
+          "type": "score",
+          "score": 1.41,
+          "confidence": 0.51,
+          "legend": {
+            "0": "Concerns are entangled: unrelated responsibilities such as transport, business rules, persistence and I/O are mixed together in the same functions",
+            "1": "Some separation exists, but responsibilities leak across boundaries and callers depend on implementation details rather than a defined interface",
+            "2": "Clear responsibilities with defined interfaces; a change to one concern stays mostly local to this unit",
+            "3": "Well-bounded units with narrow interfaces; dependencies point in one direction and units can be understood, replaced or tested independently"
+          },
+          "probabilities": {
+            "0": 0.04,
+            "1": 0.54,
+            "2": 0.39,
+            "3": 0.03
+          }
+        },
+        "security": {
+          "type": "score",
+          "score": 0.59,
+          "confidence": 0.5,
+          "legend": {
+            "0": "Trusts input or callers without checks, or handles credentials unsafely; privileged operations are reachable without an authorisation decision",
+            "1": "Partial validation or authentication, but with real gaps: some privileged paths lack an authorisation check, or unsafe defaults are used",
+            "2": "Input is validated and authorisation enforced on the main paths; only minor hardening gaps remain",
+            "3": "Consistent input validation, an explicit authorisation decision at every privileged boundary, and secrets kept out of code, logs and error messages"
+          },
+          "probabilities": {
+            "0": 0.45,
+            "1": 0.5,
+            "2": 0.04,
+            "3": 0.01
+          }
+        },
+        "testability": {
+          "type": "score",
+          "score": 1.97,
+          "confidence": 0.84,
+          "legend": {
+            "0": "Untestable as written: business logic is welded to I/O, globals and hard-coded externals with no seam to substitute",
+            "1": "Testable only with heavy setup: logic and side effects are entangled, so exercising one path requires standing up most of the surrounding system",
+            "2": "Core logic can be exercised with modest setup; some I/O still needs stubbing or a real dependency to be present",
+            "3": "Logic is separated from effects behind clear seams, so behaviour can be exercised directly and deterministically"
+          },
+          "probabilities": {
+            "0": 0.0,
+            "1": 0.09,
+            "2": 0.85,
+            "3": 0.06
+          }
+        },
+        "hardcoded_secret": {
+          "type": "noul",
+          "noul": 0.03
+        },
+        "unvalidated_input_to_sink": {
+          "type": "noul",
+          "noul": 0.46
+        },
+        "blocking_call_in_async": {
+          "type": "noul",
+          "noul": 0.36
+        }
+      },
+      "usage": {
+        "input_tokens": 5857,
+        "output_tokens": 137
+      }
+    },
+    "service/lark_qr": {
+      "model": "jev-1.13.0",
+      "answers": {
+        "error_handling": {
+          "type": "score",
+          "score": 2.27,
+          "confidence": 0.54,
+          "legend": {
+            "0": "Failure paths are unhandled: unchecked unwrap/expect, panics, or silently discarded errors on operations that can fail in normal operation",
+            "1": "Errors are surfaced but inconsistently: some paths return errors while others panic or swallow them, with no clear rule for which",
+            "2": "Most fallible paths return or propagate errors; a few unchecked spots remain, mostly in startup or genuinely-impossible branches",
+            "3": "Errors are consistently propagated with context, callers can distinguish failure modes, and no reachable panic remains on ordinary error paths"
+          },
+          "probabilities": {
+            "0": 0.0,
+            "1": 0.09,
+            "2": 0.55,
+            "3": 0.36
+          }
+        },
+        "readability": {
+          "type": "score",
+          "score": 2.65,
+          "confidence": 0.65,
+          "legend": {
+            "0": "Hard to follow: unclear or misleading names, deep nesting, long unstructured blocks where the flow cannot be traced",
+            "1": "Understandable but uneven: naming and structure vary within the file, and a reader must re-read sections to follow the control flow",
+            "2": "Clear names and structure throughout; a new maintainer can follow most flows on a first read without external help",
+            "3": "Consistently clear: intention-revealing names, well-factored flows, and comments that explain why the code is this way rather than restating what it does"
+          },
+          "probabilities": {
+            "0": 0.0,
+            "1": 0.0,
+            "2": 0.35,
+            "3": 0.65
+          }
+        },
+        "modularity": {
+          "type": "score",
+          "score": 1.85,
+          "confidence": 0.65,
+          "legend": {
+            "0": "Concerns are entangled: unrelated responsibilities such as transport, business rules, persistence and I/O are mixed together in the same functions",
+            "1": "Some separation exists, but responsibilities leak across boundaries and callers depend on implementation details rather than a defined interface",
+            "2": "Clear responsibilities with defined interfaces; a change to one concern stays mostly local to this unit",
+            "3": "Well-bounded units with narrow interfaces; dependencies point in one direction and units can be understood, replaced or tested independently"
+          },
+          "probabilities": {
+            "0": 0.01,
+            "1": 0.22,
+            "2": 0.67,
+            "3": 0.1
+          }
+        },
+        "security": {
+          "type": "score",
+          "score": 1.09,
+          "confidence": 0.5,
+          "legend": {
+            "0": "Trusts input or callers without checks, or handles credentials unsafely; privileged operations are reachable without an authorisation decision",
+            "1": "Partial validation or authentication, but with real gaps: some privileged paths lack an authorisation check, or unsafe defaults are used",
+            "2": "Input is validated and authorisation enforced on the main paths; only minor hardening gaps remain",
+            "3": "Consistent input validation, an explicit authorisation decision at every privileged boundary, and secrets kept out of code, logs and error messages"
+          },
+          "probabilities": {
+            "0": 0.21,
+            "1": 0.52,
+            "2": 0.24,
+            "3": 0.03
+          }
+        },
+        "testability": {
+          "type": "score",
+          "score": 1.51,
+          "confidence": 0.49,
+          "legend": {
+            "0": "Untestable as written: business logic is welded to I/O, globals and hard-coded externals with no seam to substitute",
+            "1": "Testable only with heavy setup: logic and side effects are entangled, so exercising one path requires standing up most of the surrounding system",
+            "2": "Core logic can be exercised with modest setup; some I/O still needs stubbing or a real dependency to be present",
+            "3": "Logic is separated from effects behind clear seams, so behaviour can be exercised directly and deterministically"
+          },
+          "probabilities": {
+            "0": 0.08,
+            "1": 0.34,
+            "2": 0.57,
+            "3": 0.01
+          }
+        },
+        "hardcoded_secret": {
+          "type": "noul",
+          "noul": 0.05
+        },
+        "unvalidated_input_to_sink": {
+          "type": "noul",
+          "noul": 0.41
+        },
+        "blocking_call_in_async": {
+          "type": "noul",
+          "noul": 0.28
+        }
+      },
+      "usage": {
+        "input_tokens": 5107,
+        "output_tokens": 137
+      }
+    },
+    "service/agent": {
+      "model": "jev-1.13.0",
+      "answers": {
+        "error_handling": {
+          "type": "score",
+          "score": 2.52,
+          "confidence": 0.52,
+          "legend": {
+            "0": "Failure paths are unhandled: unchecked unwrap/expect, panics, or silently discarded errors on operations that can fail in normal operation",
+            "1": "Errors are surfaced but inconsistently: some paths return errors while others panic or swallow them, with no clear rule for which",
+            "2": "Most fallible paths return or propagate errors; a few unchecked spots remain, mostly in startup or genuinely-impossible branches",
+            "3": "Errors are consistently propagated with context, callers can distinguish failure modes, and no reachable panic remains on ordinary error paths"
+          },
+          "probabilities": {
+            "0": 0.0,
+            "1": 0.03,
+            "2": 0.41,
+            "3": 0.56
+          }
+        },
+        "readability": {
+          "type": "score",
+          "score": 2.38,
+          "confidence": 0.6,
+          "legend": {
+            "0": "Hard to follow: unclear or misleading names, deep nesting, long unstructured blocks where the flow cannot be traced",
+            "1": "Understandable but uneven: naming and structure vary within the file, and a reader must re-read sections to follow the control flow",
+            "2": "Clear names and structure throughout; a new maintainer can follow most flows on a first read without external help",
+            "3": "Consistently clear: intention-revealing names, well-factored flows, and comments that explain why the code is this way rather than restating what it does"
+          },
+          "probabilities": {
+            "0": 0.0,
+            "1": 0.01,
+            "2": 0.6,
+            "3": 0.39
+          }
+        },
+        "modularity": {
+          "type": "score",
+          "score": 0.74,
+          "confidence": 0.5,
+          "legend": {
+            "0": "Concerns are entangled: unrelated responsibilities such as transport, business rules, persistence and I/O are mixed together in the same functions",
+            "1": "Some separation exists, but responsibilities leak across boundaries and callers depend on implementation details rather than a defined interface",
+            "2": "Clear responsibilities with defined interfaces; a change to one concern stays mostly local to this unit",
+            "3": "Well-bounded units with narrow interfaces; dependencies point in one direction and units can be understood, replaced or tested independently"
+          },
+          "probabilities": {
+            "0": 0.38,
+            "1": 0.51,
+            "2": 0.11,
+            "3": 0.0
+          }
+        },
+        "security": {
+          "type": "score",
+          "score": 1.36,
+          "confidence": 0.62,
+          "legend": {
+            "0": "Trusts input or callers without checks, or handles credentials unsafely; privileged operations are reachable without an authorisation decision",
+            "1": "Partial validation or authentication, but with real gaps: some privileged paths lack an authorisation check, or unsafe defaults are used",
+            "2": "Input is validated and authorisation enforced on the main paths; only minor hardening gaps remain",
+            "3": "Consistent input validation, an explicit authorisation decision at every privileged boundary, and secrets kept out of code, logs and error messages"
+          },
+          "probabilities": {
+            "0": 0.01,
+            "1": 0.64,
+            "2": 0.33,
+            "3": 0.02
+          }
+        },
+        "testability": {
+          "type": "score",
+          "score": 1.36,
+          "confidence": 0.62,
+          "legend": {
+            "0": "Untestable as written: business logic is welded to I/O, globals and hard-coded externals with no seam to substitute",
+            "1": "Testable only with heavy setup: logic and side effects are entangled, so exercising one path requires standing up most of the surrounding system",
+            "2": "Core logic can be exercised with modest setup; some I/O still needs stubbing or a real dependency to be present",
+            "3": "Logic is separated from effects behind clear seams, so behaviour can be exercised directly and deterministically"
+          },
+          "probabilities": {
+            "0": 0.01,
+            "1": 0.62,
+            "2": 0.36,
+            "3": 0.01
+          }
+        },
+        "hardcoded_secret": {
+          "type": "noul",
+          "noul": 0.04
+        },
+        "unvalidated_input_to_sink": {
+          "type": "noul",
+          "noul": 0.51
+        },
+        "blocking_call_in_async": {
+          "type": "noul",
+          "noul": 0.14
+        }
+      },
+      "usage": {
+        "input_tokens": 4642,
+        "output_tokens": 137
+      }
+    },
+    "service/auth": {
+      "model": "jev-1.13.0",
+      "answers": {
+        "error_handling": {
+          "type": "score",
+          "score": 1.5,
+          "confidence": 0.47,
+          "legend": {
+            "0": "Failure paths are unhandled: unchecked unwrap/expect, panics, or silently discarded errors on operations that can fail in normal operation",
+            "1": "Errors are surfaced but inconsistently: some paths return errors while others panic or swallow them, with no clear rule for which",
+            "2": "Most fallible paths return or propagate errors; a few unchecked spots remain, mostly in startup or genuinely-impossible branches",
+            "3": "Errors are consistently propagated with context, callers can distinguish failure modes, and no reachable panic remains on ordinary error paths"
+          },
+          "probabilities": {
+            "0": 0.04,
+            "1": 0.44,
+            "2": 0.51,
+            "3": 0.01
+          }
+        },
+        "readability": {
+          "type": "score",
+          "score": 2.28,
+          "confidence": 0.72,
+          "legend": {
+            "0": "Hard to follow: unclear or misleading names, deep nesting, long unstructured blocks where the flow cannot be traced",
+            "1": "Understandable but uneven: naming and structure vary within the file, and a reader must re-read sections to follow the control flow",
+            "2": "Clear names and structure throughout; a new maintainer can follow most flows on a first read without external help",
+            "3": "Consistently clear: intention-revealing names, well-factored flows, and comments that explain why the code is this way rather than restating what it does"
+          },
+          "probabilities": {
+            "0": 0.0,
+            "1": 0.0,
+            "2": 0.72,
+            "3": 0.28
+          }
+        },
+        "modularity": {
+          "type": "score",
+          "score": 0.47,
+          "confidence": 0.53,
+          "legend": {
+            "0": "Concerns are entangled: unrelated responsibilities such as transport, business rules, persistence and I/O are mixed together in the same functions",
+            "1": "Some separation exists, but responsibilities leak across boundaries and callers depend on implementation details rather than a defined interface",
+            "2": "Clear responsibilities with defined interfaces; a change to one concern stays mostly local to this unit",
+            "3": "Well-bounded units with narrow interfaces; dependencies point in one direction and units can be understood, replaced or tested independently"
+          },
+          "probabilities": {
+            "0": 0.54,
+            "1": 0.45,
+            "2": 0.01,
+            "3": 0.0
+          }
+        },
+        "security": {
+          "type": "score",
+          "score": 0.99,
+          "confidence": 0.76,
+          "legend": {
+            "0": "Trusts input or callers without checks, or handles credentials unsafely; privileged operations are reachable without an authorisation decision",
+            "1": "Partial validation or authentication, but with real gaps: some privileged paths lack an authorisation check, or unsafe defaults are used",
+            "2": "Input is validated and authorisation enforced on the main paths; only minor hardening gaps remain",
+            "3": "Consistent input validation, an explicit authorisation decision at every privileged boundary, and secrets kept out of code, logs and error messages"
+          },
+          "probabilities": {
+            "0": 0.13,
+            "1": 0.76,
+            "2": 0.11,
+            "3": 0.0
+          }
+        },
+        "testability": {
+          "type": "score",
+          "score": 1.68,
+          "confidence": 0.67,
+          "legend": {
+            "0": "Untestable as written: business logic is welded to I/O, globals and hard-coded externals with no seam to substitute",
+            "1": "Testable only with heavy setup: logic and side effects are entangled, so exercising one path requires standing up most of the surrounding system",
+            "2": "Core logic can be exercised with modest setup; some I/O still needs stubbing or a real dependency to be present",
+            "3": "Logic is separated from effects behind clear seams, so behaviour can be exercised directly and deterministically"
+          },
+          "probabilities": {
+            "0": 0.0,
+            "1": 0.32,
+            "2": 0.68,
+            "3": 0.0
+          }
+        },
+        "hardcoded_secret": {
+          "type": "noul",
+          "noul": 0.05
+        },
+        "unvalidated_input_to_sink": {
+          "type": "noul",
+          "noul": 0.21
+        },
+        "blocking_call_in_async": {
+          "type": "noul",
+          "noul": 0.21
+        }
+      },
+      "usage": {
+        "input_tokens": 3751,
+        "output_tokens": 137
+      }
+    },
+    "service/sync": {
+      "model": "jev-1.13.0",
+      "answers": {
+        "error_handling": {
+          "type": "score",
+          "score": 2.13,
+          "confidence": 0.61,
+          "legend": {
+            "0": "Failure paths are unhandled: unchecked unwrap/expect, panics, or silently discarded errors on operations that can fail in normal operation",
+            "1": "Errors are surfaced but inconsistently: some paths return errors while others panic or swallow them, with no clear rule for which",
+            "2": "Most fallible paths return or propagate errors; a few unchecked spots remain, mostly in startup or genuinely-impossible branches",
+            "3": "Errors are consistently propagated with context, callers can distinguish failure modes, and no reachable panic remains on ordinary error paths"
+          },
+          "probabilities": {
+            "0": 0.0,
+            "1": 0.12,
+            "2": 0.62,
+            "3": 0.26
+          }
+        },
+        "readability": {
+          "type": "score",
+          "score": 2.72,
+          "confidence": 0.72,
+          "legend": {
+            "0": "Hard to follow: unclear or misleading names, deep nesting, long unstructured blocks where the flow cannot be traced",
+            "1": "Understandable but uneven: naming and structure vary within the file, and a reader must re-read sections to follow the control flow",
+            "2": "Clear names and structure throughout; a new maintainer can follow most flows on a first read without external help",
+            "3": "Consistently clear: intention-revealing names, well-factored flows, and comments that explain why the code is this way rather than restating what it does"
+          },
+          "probabilities": {
+            "0": 0.0,
+            "1": 0.0,
+            "2": 0.28,
+            "3": 0.72
+          }
+        },
+        "modularity": {
+          "type": "score",
+          "score": 1.17,
+          "confidence": 0.6,
+          "legend": {
+            "0": "Concerns are entangled: unrelated responsibilities such as transport, business rules, persistence and I/O are mixed together in the same functions",
+            "1": "Some separation exists, but responsibilities leak across boundaries and callers depend on implementation details rather than a defined interface",
+            "2": "Clear responsibilities with defined interfaces; a change to one concern stays mostly local to this unit",
+            "3": "Well-bounded units with narrow interfaces; dependencies point in one direction and units can be understood, replaced or tested independently"
+          },
+          "probabilities": {
+            "0": 0.12,
+            "1": 0.59,
+            "2": 0.28,
+            "3": 0.01
+          }
+        },
+        "security": {
+          "type": "score",
+          "score": 0.42,
+          "confidence": 0.58,
+          "legend": {
+            "0": "Trusts input or callers without checks, or handles credentials unsafely; privileged operations are reachable without an authorisation decision",
+            "1": "Partial validation or authentication, but with real gaps: some privileged paths lack an authorisation check, or unsafe defaults are used",
+            "2": "Input is validated and authorisation enforced on the main paths; only minor hardening gaps remain",
+            "3": "Consistent input validation, an explicit authorisation decision at every privileged boundary, and secrets kept out of code, logs and error messages"
+          },
+          "probabilities": {
+            "0": 0.59,
+            "1": 0.41,
+            "2": 0.0,
+            "3": 0.0
+          }
+        },
+        "testability": {
+          "type": "score",
+          "score": 1.66,
+          "confidence": 0.61,
+          "legend": {
+            "0": "Untestable as written: business logic is welded to I/O, globals and hard-coded externals with no seam to substitute",
+            "1": "Testable only with heavy setup: logic and side effects are entangled, so exercising one path requires standing up most of the surrounding system",
+            "2": "Core logic can be exercised with modest setup; some I/O still needs stubbing or a real dependency to be present",
+            "3": "Logic is separated from effects behind clear seams, so behaviour can be exercised directly and deterministically"
+          },
+          "probabilities": {
+            "0": 0.01,
+            "1": 0.34,
+            "2": 0.63,
+            "3": 0.02
+          }
+        },
+        "hardcoded_secret": {
+          "type": "noul",
+          "noul": 0.09
+        },
+        "unvalidated_input_to_sink": {
+          "type": "noul",
+          "noul": 0.92
+        },
+        "blocking_call_in_async": {
+          "type": "noul",
+          "noul": 0.34
+        }
+      },
+      "usage": {
+        "input_tokens": 4183,
+        "output_tokens": 137
+      }
+    },
+    "service/organization": {
+      "model": "jev-1.13.0",
+      "answers": {
+        "error_handling": {
+          "type": "score",
+          "score": 2.03,
+          "confidence": 0.67,
+          "legend": {
+            "0": "Failure paths are unhandled: unchecked unwrap/expect, panics, or silently discarded errors on operations that can fail in normal operation",
+            "1": "Errors are surfaced but inconsistently: some paths return errors while others panic or swallow them, with no clear rule for which",
+            "2": "Most fallible paths return or propagate errors; a few unchecked spots remain, mostly in startup or genuinely-impossible branches",
+            "3": "Errors are consistently propagated with context, callers can distinguish failure modes, and no reachable panic remains on ordinary error paths"
+          },
+          "probabilities": {
+            "0": 0.01,
+            "1": 0.12,
+            "2": 0.69,
+            "3": 0.18
+          }
+        },
+        "readability": {
+          "type": "score",
+          "score": 2.82,
+          "confidence": 0.82,
+          "legend": {
+            "0": "Hard to follow: unclear or misleading names, deep nesting, long unstructured blocks where the flow cannot be traced",
+            "1": "Understandable but uneven: naming and structure vary within the file, and a reader must re-read sections to follow the control flow",
+            "2": "Clear names and structure throughout; a new maintainer can follow most flows on a first read without external help",
+            "3": "Consistently clear: intention-revealing names, well-factored flows, and comments that explain why the code is this way rather than restating what it does"
+          },
+          "probabilities": {
+            "0": 0.0,
+            "1": 0.0,
+            "2": 0.18,
+            "3": 0.82
+          }
+        },
+        "modularity": {
+          "type": "score",
+          "score": 1.75,
+          "confidence": 0.56,
+          "legend": {
+            "0": "Concerns are entangled: unrelated responsibilities such as transport, business rules, persistence and I/O are mixed together in the same functions",
+            "1": "Some separation exists, but responsibilities leak across boundaries and callers depend on implementation details rather than a defined interface",
+            "2": "Clear responsibilities with defined interfaces; a change to one concern stays mostly local to this unit",
+            "3": "Well-bounded units with narrow interfaces; dependencies point in one direction and units can be understood, replaced or tested independently"
+          },
+          "probabilities": {
+            "0": 0.02,
+            "1": 0.31,
+            "2": 0.58,
+            "3": 0.09
+          }
+        },
+        "security": {
+          "type": "score",
+          "score": 0.4,
+          "confidence": 0.6,
+          "legend": {
+            "0": "Trusts input or callers without checks, or handles credentials unsafely; privileged operations are reachable without an authorisation decision",
+            "1": "Partial validation or authentication, but with real gaps: some privileged paths lack an authorisation check, or unsafe defaults are used",
+            "2": "Input is validated and authorisation enforced on the main paths; only minor hardening gaps remain",
+            "3": "Consistent input validation, an explicit authorisation decision at every privileged boundary, and secrets kept out of code, logs and error messages"
+          },
+          "probabilities": {
+            "0": 0.61,
+            "1": 0.38,
+            "2": 0.01,
+            "3": 0.0
+          }
+        },
+        "testability": {
+          "type": "score",
+          "score": 1.62,
+          "confidence": 0.58,
+          "legend": {
+            "0": "Untestable as written: business logic is welded to I/O, globals and hard-coded externals with no seam to substitute",
+            "1": "Testable only with heavy setup: logic and side effects are entangled, so exercising one path requires standing up most of the surrounding system",
+            "2": "Core logic can be exercised with modest setup; some I/O still needs stubbing or a real dependency to be present",
+            "3": "Logic is separated from effects behind clear seams, so behaviour can be exercised directly and deterministically"
+          },
+          "probabilities": {
+            "0": 0.04,
+            "1": 0.32,
+            "2": 0.62,
+            "3": 0.02
+          }
+        },
+        "hardcoded_secret": {
+          "type": "noul",
+          "noul": 0.12
+        },
+        "unvalidated_input_to_sink": {
+          "type": "noul",
+          "noul": 0.27
+        },
+        "blocking_call_in_async": {
+          "type": "noul",
+          "noul": 0.09
+        }
+      },
+      "usage": {
+        "input_tokens": 4135,
+        "output_tokens": 137
+      }
+    },
+    "service/wechat_qr": {
+      "model": "jev-1.13.0",
+      "answers": {
+        "error_handling": {
+          "type": "score",
+          "score": 1.97,
+          "confidence": 0.62,
+          "legend": {
+            "0": "Failure paths are unhandled: unchecked unwrap/expect, panics, or silently discarded errors on operations that can fail in normal operation",
+            "1": "Errors are surfaced but inconsistently: some paths return errors while others panic or swallow them, with no clear rule for which",
+            "2": "Most fallible paths return or propagate errors; a few unchecked spots remain, mostly in startup or genuinely-impossible branches",
+            "3": "Errors are consistently propagated with context, callers can distinguish failure modes, and no reachable panic remains on ordinary error paths"
+          },
+          "probabilities": {
+            "0": 0.01,
+            "1": 0.18,
+            "2": 0.63,
+            "3": 0.18
+          }
+        },
+        "readability": {
+          "type": "score",
+          "score": 1.99,
+          "confidence": 0.99,
+          "legend": {
+            "0": "Hard to follow: unclear or misleading names, deep nesting, long unstructured blocks where the flow cannot be traced",
+            "1": "Understandable but uneven: naming and structure vary within the file, and a reader must re-read sections to follow the control flow",
+            "2": "Clear names and structure throughout; a new maintainer can follow most flows on a first read without external help",
+            "3": "Consistently clear: intention-revealing names, well-factored flows, and comments that explain why the code is this way rather than restating what it does"
+          },
+          "probabilities": {
+            "0": 0.0,
+            "1": 0.01,
+            "2": 0.99,
+            "3": 0.0
+          }
+        },
+        "modularity": {
+          "type": "score",
+          "score": 1.76,
+          "confidence": 0.58,
+          "legend": {
+            "0": "Concerns are entangled: unrelated responsibilities such as transport, business rules, persistence and I/O are mixed together in the same functions",
+            "1": "Some separation exists, but responsibilities leak across boundaries and callers depend on implementation details rather than a defined interface",
+            "2": "Clear responsibilities with defined interfaces; a change to one concern stays mostly local to this unit",
+            "3": "Well-bounded units with narrow interfaces; dependencies point in one direction and units can be understood, replaced or tested independently"
+          },
+          "probabilities": {
+            "0": 0.01,
+            "1": 0.31,
+            "2": 0.59,
+            "3": 0.09
+          }
+        },
+        "security": {
+          "type": "score",
+          "score": 0.67,
+          "confidence": 0.55,
+          "legend": {
+            "0": "Trusts input or callers without checks, or handles credentials unsafely; privileged operations are reachable without an authorisation decision",
+            "1": "Partial validation or authentication, but with real gaps: some privileged paths lack an authorisation check, or unsafe defaults are used",
+            "2": "Input is validated and authorisation enforced on the main paths; only minor hardening gaps remain",
+            "3": "Consistent input validation, an explicit authorisation decision at every privileged boundary, and secrets kept out of code, logs and error messages"
+          },
+          "probabilities": {
+            "0": 0.39,
+            "1": 0.55,
+            "2": 0.05,
+            "3": 0.0
+          }
+        },
+        "testability": {
+          "type": "score",
+          "score": 1.66,
+          "confidence": 0.65,
+          "legend": {
+            "0": "Untestable as written: business logic is welded to I/O, globals and hard-coded externals with no seam to substitute",
+            "1": "Testable only with heavy setup: logic and side effects are entangled, so exercising one path requires standing up most of the surrounding system",
+            "2": "Core logic can be exercised with modest setup; some I/O still needs stubbing or a real dependency to be present",
+            "3": "Logic is separated from effects behind clear seams, so behaviour can be exercised directly and deterministically"
+          },
+          "probabilities": {
+            "0": 0.11,
+            "1": 0.13,
+            "2": 0.75,
+            "3": 0.01
+          }
+        },
+        "hardcoded_secret": {
+          "type": "noul",
+          "noul": 0.11
+        },
+        "unvalidated_input_to_sink": {
+          "type": "noul",
+          "noul": 0.79
+        },
+        "blocking_call_in_async": {
+          "type": "noul",
+          "noul": 0.09
+        }
+      },
+      "usage": {
+        "input_tokens": 2414,
+        "output_tokens": 137
+      }
+    },
+    "api": {
+      "model": "jev-1.13.0",
+      "answers": {
+        "error_handling": {
+          "type": "score",
+          "score": 2.03,
+          "confidence": 0.63,
+          "legend": {
+            "0": "Failure paths are unhandled: unchecked unwrap/expect, panics, or silently discarded errors on operations that can fail in normal operation",
+            "1": "Errors are surfaced but inconsistently: some paths return errors while others panic or swallow them, with no clear rule for which",
+            "2": "Most fallible paths return or propagate errors; a few unchecked spots remain, mostly in startup or genuinely-impossible branches",
+            "3": "Errors are consistently propagated with context, callers can distinguish failure modes, and no reachable panic remains on ordinary error paths"
+          },
+          "probabilities": {
+            "0": 0.0,
+            "1": 0.16,
+            "2": 0.64,
+            "3": 0.2
+          }
+        },
+        "readability": {
+          "type": "score",
+          "score": 2.61,
+          "confidence": 0.61,
+          "legend": {
+            "0": "Hard to follow: unclear or misleading names, deep nesting, long unstructured blocks where the flow cannot be traced",
+            "1": "Understandable but uneven: naming and structure vary within the file, and a reader must re-read sections to follow the control flow",
+            "2": "Clear names and structure throughout; a new maintainer can follow most flows on a first read without external help",
+            "3": "Consistently clear: intention-revealing names, well-factored flows, and comments that explain why the code is this way rather than restating what it does"
+          },
+          "probabilities": {
+            "0": 0.0,
+            "1": 0.0,
+            "2": 0.39,
+            "3": 0.61
+          }
+        },
+        "modularity": {
+          "type": "score",
+          "score": 1.85,
+          "confidence": 0.67,
+          "legend": {
+            "0": "Concerns are entangled: unrelated responsibilities such as transport, business rules, persistence and I/O are mixed together in the same functions",
+            "1": "Some separation exists, but responsibilities leak across boundaries and callers depend on implementation details rather than a defined interface",
+            "2": "Clear responsibilities with defined interfaces; a change to one concern stays mostly local to this unit",
+            "3": "Well-bounded units with narrow interfaces; dependencies point in one direction and units can be understood, replaced or tested independently"
+          },
+          "probabilities": {
+            "0": 0.0,
+            "1": 0.23,
+            "2": 0.68,
+            "3": 0.09
+          }
+        },
+        "security": {
+          "type": "score",
+          "score": 1.38,
+          "confidence": 0.56,
+          "legend": {
+            "0": "Trusts input or callers without checks, or handles credentials unsafely; privileged operations are reachable without an authorisation decision",
+            "1": "Partial validation or authentication, but with real gaps: some privileged paths lack an authorisation check, or unsafe defaults are used",
+            "2": "Input is validated and authorisation enforced on the main paths; only minor hardening gaps remain",
+            "3": "Consistent input validation, an explicit authorisation decision at every privileged boundary, and secrets kept out of code, logs and error messages"
+          },
+          "probabilities": {
+            "0": 0.03,
+            "1": 0.59,
+            "2": 0.35,
+            "3": 0.03
+          }
+        },
+        "testability": {
+          "type": "score",
+          "score": 1.83,
+          "confidence": 0.66,
+          "legend": {
+            "0": "Untestable as written: business logic is welded to I/O, globals and hard-coded externals with no seam to substitute",
+            "1": "Testable only with heavy setup: logic and side effects are entangled, so exercising one path requires standing up most of the surrounding system",
+            "2": "Core logic can be exercised with modest setup; some I/O still needs stubbing or a real dependency to be present",
+            "3": "Logic is separated from effects behind clear seams, so behaviour can be exercised directly and deterministically"
+          },
+          "probabilities": {
+            "0": 0.0,
+            "1": 0.25,
+            "2": 0.66,
+            "3": 0.09
+          }
+        },
+        "hardcoded_secret": {
+          "type": "noul",
+          "noul": 0.1
+        },
+        "unvalidated_input_to_sink": {
+          "type": "noul",
+          "noul": 0.37
+        },
+        "blocking_call_in_async": {
+          "type": "noul",
+          "noul": 0.14
+        }
+      },
+      "usage": {
+        "input_tokens": 8126,
+        "output_tokens": 137
+      }
+    },
+    "data_layer": {
+      "model": "jev-1.13.0",
+      "answers": {
+        "error_handling": {
+          "type": "score",
+          "score": 2.47,
+          "confidence": 0.47,
+          "legend": {
+            "0": "Failure paths are unhandled: unchecked unwrap/expect, panics, or silently discarded errors on operations that can fail in normal operation",
+            "1": "Errors are surfaced but inconsistently: some paths return errors while others panic or swallow them, with no clear rule for which",
+            "2": "Most fallible paths return or propagate errors; a few unchecked spots remain, mostly in startup or genuinely-impossible branches",
+            "3": "Errors are consistently propagated with context, callers can distinguish failure modes, and no reachable panic remains on ordinary error paths"
+          },
+          "probabilities": {
+            "0": 0.01,
+            "1": 0.02,
+            "2": 0.47,
+            "3": 0.5
+          }
+        },
+        "readability": {
+          "type": "score",
+          "score": 2.71,
+          "confidence": 0.71,
+          "legend": {
+            "0": "Hard to follow: unclear or misleading names, deep nesting, long unstructured blocks where the flow cannot be traced",
+            "1": "Understandable but uneven: naming and structure vary within the file, and a reader must re-read sections to follow the control flow",
+            "2": "Clear names and structure throughout; a new maintainer can follow most flows on a first read without external help",
+            "3": "Consistently clear: intention-revealing names, well-factored flows, and comments that explain why the code is this way rather than restating what it does"
+          },
+          "probabilities": {
+            "0": 0.0,
+            "1": 0.0,
+            "2": 0.29,
+            "3": 0.71
+          }
+        },
+        "modularity": {
+          "type": "score",
+          "score": 2.32,
+          "confidence": 0.52,
+          "legend": {
+            "0": "Concerns are entangled: unrelated responsibilities such as transport, business rules, persistence and I/O are mixed together in the same functions",
+            "1": "Some separation exists, but responsibilities leak across boundaries and callers depend on implementation details rather than a defined interface",
+            "2": "Clear responsibilities with defined interfaces; a change to one concern stays mostly local to this unit",
+            "3": "Well-bounded units with narrow interfaces; dependencies point in one direction and units can be understood, replaced or tested independently"
+          },
+          "probabilities": {
+            "0": 0.0,
+            "1": 0.08,
+            "2": 0.52,
+            "3": 0.4
+          }
+        },
+        "security": {
+          "type": "score",
+          "score": 0.69,
+          "confidence": 0.56,
+          "legend": {
+            "0": "Trusts input or callers without checks, or handles credentials unsafely; privileged operations are reachable without an authorisation decision",
+            "1": "Partial validation or authentication, but with real gaps: some privileged paths lack an authorisation check, or unsafe defaults are used",
+            "2": "Input is validated and authorisation enforced on the main paths; only minor hardening gaps remain",
+            "3": "Consistent input validation, an explicit authorisation decision at every privileged boundary, and secrets kept out of code, logs and error messages"
+          },
+          "probabilities": {
+            "0": 0.37,
+            "1": 0.57,
+            "2": 0.05,
+            "3": 0.01
+          }
+        },
+        "testability": {
+          "type": "score",
+          "score": 2.2,
+          "confidence": 0.45,
+          "legend": {
+            "0": "Untestable as written: business logic is welded to I/O, globals and hard-coded externals with no seam to substitute",
+            "1": "Testable only with heavy setup: logic and side effects are entangled, so exercising one path requires standing up most of the surrounding system",
+            "2": "Core logic can be exercised with modest setup; some I/O still needs stubbing or a real dependency to be present",
+            "3": "Logic is separated from effects behind clear seams, so behaviour can be exercised directly and deterministically"
+          },
+          "probabilities": {
+            "0": 0.02,
+            "1": 0.14,
+            "2": 0.47,
+            "3": 0.37
+          }
+        },
+        "hardcoded_secret": {
+          "type": "noul",
+          "noul": 0.7
+        },
+        "unvalidated_input_to_sink": {
+          "type": "noul",
+          "noul": 0.53
+        },
+        "blocking_call_in_async": {
+          "type": "noul",
+          "noul": 0.15
+        }
+      },
+      "usage": {
+        "input_tokens": 10093,
+        "output_tokens": 137
+      }
+    },
+    "config_middleware": {
+      "model": "jev-1.13.0",
+      "answers": {
+        "error_handling": {
+          "type": "score",
+          "score": 2.25,
+          "confidence": 0.56,
+          "legend": {
+            "0": "Failure paths are unhandled: unchecked unwrap/expect, panics, or silently discarded errors on operations that can fail in normal operation",
+            "1": "Errors are surfaced but inconsistently: some paths return errors while others panic or swallow them, with no clear rule for which",
+            "2": "Most fallible paths return or propagate errors; a few unchecked spots remain, mostly in startup or genuinely-impossible branches",
+            "3": "Errors are consistently propagated with context, callers can distinguish failure modes, and no reachable panic remains on ordinary error paths"
+          },
+          "probabilities": {
+            "0": 0.0,
+            "1": 0.09,
+            "2": 0.56,
+            "3": 0.35
+          }
+        },
+        "readability": {
+          "type": "score",
+          "score": 2.39,
+          "confidence": 0.6,
+          "legend": {
+            "0": "Hard to follow: unclear or misleading names, deep nesting, long unstructured blocks where the flow cannot be traced",
+            "1": "Understandable but uneven: naming and structure vary within the file, and a reader must re-read sections to follow the control flow",
+            "2": "Clear names and structure throughout; a new maintainer can follow most flows on a first read without external help",
+            "3": "Consistently clear: intention-revealing names, well-factored flows, and comments that explain why the code is this way rather than restating what it does"
+          },
+          "probabilities": {
+            "0": 0.0,
+            "1": 0.0,
+            "2": 0.6,
+            "3": 0.4
+          }
+        },
+        "modularity": {
+          "type": "score",
+          "score": 1.84,
+          "confidence": 0.62,
+          "legend": {
+            "0": "Concerns are entangled: unrelated responsibilities such as transport, business rules, persistence and I/O are mixed together in the same functions",
+            "1": "Some separation exists, but responsibilities leak across boundaries and callers depend on implementation details rather than a defined interface",
+            "2": "Clear responsibilities with defined interfaces; a change to one concern stays mostly local to this unit",
+            "3": "Well-bounded units with narrow interfaces; dependencies point in one direction and units can be understood, replaced or tested independently"
+          },
+          "probabilities": {
+            "0": 0.01,
+            "1": 0.25,
+            "2": 0.63,
+            "3": 0.11
+          }
+        },
+        "security": {
+          "type": "score",
+          "score": 1.72,
+          "confidence": 0.62,
+          "legend": {
+            "0": "Trusts input or callers without checks, or handles credentials unsafely; privileged operations are reachable without an authorisation decision",
+            "1": "Partial validation or authentication, but with real gaps: some privileged paths lack an authorisation check, or unsafe defaults are used",
+            "2": "Input is validated and authorisation enforced on the main paths; only minor hardening gaps remain",
+            "3": "Consistent input validation, an explicit authorisation decision at every privileged boundary, and secrets kept out of code, logs and error messages"
+          },
+          "probabilities": {
+            "0": 0.0,
+            "1": 0.32,
+            "2": 0.63,
+            "3": 0.05
+          }
+        },
+        "testability": {
+          "type": "score",
+          "score": 1.92,
+          "confidence": 0.85,
+          "legend": {
+            "0": "Untestable as written: business logic is welded to I/O, globals and hard-coded externals with no seam to substitute",
+            "1": "Testable only with heavy setup: logic and side effects are entangled, so exercising one path requires standing up most of the surrounding system",
+            "2": "Core logic can be exercised with modest setup; some I/O still needs stubbing or a real dependency to be present",
+            "3": "Logic is separated from effects behind clear seams, so behaviour can be exercised directly and deterministically"
+          },
+          "probabilities": {
+            "0": 0.0,
+            "1": 0.11,
+            "2": 0.86,
+            "3": 0.03
+          }
+        },
+        "hardcoded_secret": {
+          "type": "noul",
+          "noul": 0.06
+        },
+        "unvalidated_input_to_sink": {
+          "type": "noul",
+          "noul": 0.36
+        },
+        "blocking_call_in_async": {
+          "type": "noul",
+          "noul": 0.13
+        }
+      },
+      "usage": {
+        "input_tokens": 3389,
+        "output_tokens": 137
+      }
+    },
+    "app_entry": {
+      "model": "jev-1.13.0",
+      "answers": {
+        "error_handling": {
+          "type": "score",
+          "score": 1.67,
+          "confidence": 0.66,
+          "legend": {
+            "0": "Failure paths are unhandled: unchecked unwrap/expect, panics, or silently discarded errors on operations that can fail in normal operation",
+            "1": "Errors are surfaced but inconsistently: some paths return errors while others panic or swallow them, with no clear rule for which",
+            "2": "Most fallible paths return or propagate errors; a few unchecked spots remain, mostly in startup or genuinely-impossible branches",
+            "3": "Errors are consistently propagated with context, callers can distinguish failure modes, and no reachable panic remains on ordinary error paths"
+          },
+          "probabilities": {
+            "0": 0.01,
+            "1": 0.31,
+            "2": 0.68,
+            "3": 0.0
+          }
+        },
+        "readability": {
+          "type": "score",
+          "score": 2.88,
+          "confidence": 0.88,
+          "legend": {
+            "0": "Hard to follow: unclear or misleading names, deep nesting, long unstructured blocks where the flow cannot be traced",
+            "1": "Understandable but uneven: naming and structure vary within the file, and a reader must re-read sections to follow the control flow",
+            "2": "Clear names and structure throughout; a new maintainer can follow most flows on a first read without external help",
+            "3": "Consistently clear: intention-revealing names, well-factored flows, and comments that explain why the code is this way rather than restating what it does"
+          },
+          "probabilities": {
+            "0": 0.0,
+            "1": 0.0,
+            "2": 0.12,
+            "3": 0.88
+          }
+        },
+        "modularity": {
+          "type": "score",
+          "score": 1.14,
+          "confidence": 0.6,
+          "legend": {
+            "0": "Concerns are entangled: unrelated responsibilities such as transport, business rules, persistence and I/O are mixed together in the same functions",
+            "1": "Some separation exists, but responsibilities leak across boundaries and callers depend on implementation details rather than a defined interface",
+            "2": "Clear responsibilities with defined interfaces; a change to one concern stays mostly local to this unit",
+            "3": "Well-bounded units with narrow interfaces; dependencies point in one direction and units can be understood, replaced or tested independently"
+          },
+          "probabilities": {
+            "0": 0.13,
+            "1": 0.62,
+            "2": 0.23,
+            "3": 0.02
+          }
+        },
+        "security": {
+          "type": "score",
+          "score": 1.33,
+          "confidence": 0.6,
+          "legend": {
+            "0": "Trusts input or callers without checks, or handles credentials unsafely; privileged operations are reachable without an authorisation decision",
+            "1": "Partial validation or authentication, but with real gaps: some privileged paths lack an authorisation check, or unsafe defaults are used",
+            "2": "Input is validated and authorisation enforced on the main paths; only minor hardening gaps remain",
+            "3": "Consistent input validation, an explicit authorisation decision at every privileged boundary, and secrets kept out of code, logs and error messages"
+          },
+          "probabilities": {
+            "0": 0.04,
+            "1": 0.61,
+            "2": 0.33,
+            "3": 0.02
+          }
+        },
+        "testability": {
+          "type": "score",
+          "score": 1.8,
+          "confidence": 0.74,
+          "legend": {
+            "0": "Untestable as written: business logic is welded to I/O, globals and hard-coded externals with no seam to substitute",
+            "1": "Testable only with heavy setup: logic and side effects are entangled, so exercising one path requires standing up most of the surrounding system",
+            "2": "Core logic can be exercised with modest setup; some I/O still needs stubbing or a real dependency to be present",
+            "3": "Logic is separated from effects behind clear seams, so behaviour can be exercised directly and deterministically"
+          },
+          "probabilities": {
+            "0": 0.0,
+            "1": 0.23,
+            "2": 0.74,
+            "3": 0.03
+          }
+        },
+        "hardcoded_secret": {
+          "type": "noul",
+          "noul": 0.09
+        },
+        "unvalidated_input_to_sink": {
+          "type": "noul",
+          "noul": 0.42
+        },
+        "blocking_call_in_async": {
+          "type": "noul",
+          "noul": 0.21
+        }
+      },
+      "usage": {
+        "input_tokens": 9080,
+        "output_tokens": 137
+      }
+    },
+    "documentation": {
+      "model": "jev-1.13.0",
+      "answers": {
+        "doc_completeness": {
+          "type": "score",
+          "score": 2.33,
+          "confidence": 0.66,
+          "legend": {
+            "0": "Sparse or missing: a reader cannot get the system running or understand its shape from these documents alone",
+            "1": "Covers the basics such as setup and purpose, but architecture, operational procedures or failure modes are absent or hand-waved",
+            "2": "Covers purpose, setup, architecture and day-to-day operation; a new engineer could become productive with only minor gaps",
+            "3": "Comprehensive and maintained: concepts, architecture, setup, operations and failure handling are all documented with enough specificity to act on"
+          },
+          "probabilities": {
+            "0": 0.0,
+            "1": 0.0,
+            "2": 0.67,
+            "3": 0.33
+          }
+        },
+        "doc_specificity": {
+          "type": "score",
+          "score": 2.84,
+          "confidence": 0.84,
+          "legend": {
+            "0": "Generic prose with no concrete commands, keys or endpoints a reader can act on",
+            "1": "Some concrete details, but key steps are vague or outdated relative to the system described elsewhere in these documents",
+            "2": "Concrete and mostly accurate: real commands, configuration keys and endpoints, with only occasional gaps",
+            "3": "Precise and verifiable throughout: exact commands, configuration keys, endpoint paths and expected outcomes a reader can check against"
+          },
+          "probabilities": {
+            "0": 0.0,
+            "1": 0.0,
+            "2": 0.16,
+            "3": 0.84
+          }
+        }
+      },
+      "usage": {
+        "input_tokens": 18110,
+        "output_tokens": 38
+      }
+    },
+    "infrastructure": {
+      "model": "jev-1.13.0",
+      "answers": {
+        "build_reproducibility": {
+          "type": "score",
+          "score": 0.97,
+          "confidence": 0.95,
+          "legend": {
+            "0": "Unpinned and non-deterministic: floating base images or dependency ranges mean two builds can differ with no record of why",
+            "1": "Partially pinned: some inputs are pinned while others float, or the toolchain version is not fixed",
+            "2": "Pinned dependencies, base images and toolchain; a rebuild reproduces the same artifact",
+            "3": "Pinned and verifiable: lockfiles enforced in CI, images referenced by digest or immutable tag, and the build is hermetic"
+          },
+          "probabilities": {
+            "0": 0.04,
+            "1": 0.95,
+            "2": 0.01,
+            "3": 0.0
+          }
+        },
+        "deployment_safety": {
+          "type": "score",
+          "score": 1.35,
+          "confidence": 0.62,
+          "legend": {
+            "0": "Unsafe by omission: no health checks, no resource limits, secrets or privileged settings embedded, and a failure leaves the system in an unknown state",
+            "1": "Basic deployment works, but important safety features such as probes, resource limits or safe secret handling are missing",
+            "2": "Health checks, resource limits and secret injection are in place; rollout behaviour is predictable",
+            "3": "Failures are contained and recoverable: probes, limits, scoped secrets, and a rollout strategy with a clear rollback path"
+          },
+          "probabilities": {
+            "0": 0.02,
+            "1": 0.64,
+            "2": 0.32,
+            "3": 0.02
+          }
+        },
+        "secret_hygiene": {
+          "type": "score",
+          "score": 0.3,
+          "confidence": 0.7,
+          "legend": {
+            "0": "Secrets are written into committed files, or copied into an image in a way that bakes them permanently into a layer",
+            "1": "Secrets mostly come from outside, but some are passed through mechanisms that leave them in image layers, history or logs",
+            "2": "Secrets are injected at runtime rather than build time, with only minor leakage risk from build arguments or copied files",
+            "3": "Secrets are consistently injected at runtime from a secret store, never written into the repository, image layers, or build logs"
+          },
+          "probabilities": {
+            "0": 0.78,
+            "1": 0.14,
+            "2": 0.07,
+            "3": 0.01
+          }
+        }
+      },
+      "usage": {
+        "input_tokens": 11182,
+        "output_tokens": 54
+      }
+    },
+    "tests": {
+      "model": "jev-1.13.0",
+      "answers": {
+        "test_depth": {
+          "type": "score",
+          "score": 2.49,
+          "confidence": 0.51,
+          "legend": {
+            "0": "Tests are absent, or assert only that a call does not crash without checking any outcome",
+            "1": "Happy paths are asserted, but error paths, boundaries and edge cases are not covered",
+            "2": "Main behaviours including some error paths and boundaries are asserted with meaningful expectations",
+            "3": "Behaviour is pinned down thoroughly: error paths, boundaries and edge cases are asserted, so a regression in behaviour fails a test"
+          },
+          "probabilities": {
+            "0": 0.0,
+            "1": 0.0,
+            "2": 0.51,
+            "3": 0.49
+          }
+        },
+        "test_breadth": {
+          "type": "score",
+          "score": 1.37,
+          "confidence": 0.58,
+          "legend": {
+            "0": "No meaningful surface is exercised; the bulk of the system has no test that touches it",
+            "1": "A small fraction of the system is exercised, concentrated in one or two areas while the rest is untested",
+            "2": "A substantial portion of the core workflows is exercised, with some modules or cross-module paths still untested",
+            "3": "Broad coverage across the system's main modules and their integration paths"
+          },
+          "probabilities": {
+            "0": 0.02,
+            "1": 0.59,
+            "2": 0.39,
+            "3": 0.0
+          }
+        },
+        "test_isolation": {
+          "type": "score",
+          "score": 2.21,
+          "confidence": 0.4,
+          "legend": {
+            "0": "Tests depend on external services or shared state, so results are flaky or depend on run order",
+            "1": "Mostly isolated, but some tests need a live dependency or shared fixture to pass",
+            "2": "Well isolated and deterministic, with dependencies replaced or scoped per test",
+            "3": "Fully hermetic: each test owns its state, no external dependency, and a failure reliably indicates a real defect"
+          },
+          "probabilities": {
+            "0": 0.03,
+            "1": 0.14,
+            "2": 0.42,
+            "3": 0.41
+          }
+        }
+      },
+      "usage": {
+        "input_tokens": 6637,
+        "output_tokens": 50
+      }
+    }
+  }
+}

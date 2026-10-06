@@ -3,6 +3,7 @@ model:
   provider: alibaba
   base_url: __OPENAI_BASE_URL__/v1
   api_key: __OPENAI_API_KEY__
+  context_length: 1024000
 providers: {}
 fallback_providers: []
 credential_pool_strategies: {}
@@ -141,10 +142,10 @@ tool_loop_guardrails:
     idempotent_no_progress: 5
 compression:
   enabled: true
-  threshold: 0.5
+  threshold: 0.9
   target_ratio: 0.2
   protect_last_n: 20
-  hygiene_hard_message_limit: 400
+  hygiene_hard_message_limit: 1000
   protect_first_n: 3
   abort_on_summary_failure: false
   codex_gpt55_autoraise: true
